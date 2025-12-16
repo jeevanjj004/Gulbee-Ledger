@@ -1,0 +1,86 @@
+{% extends 'reports/base.html' %}
+{% block content %}
+<style>
+/* Same CSS as income.html */
+body { font-family: Arial, sans-serif; background: #f8f9fa; padding:20px; }
+h2 { text-align: center; color: #333; }
+form { background: #fff; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1);
+       display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:15px; align-items:center; }
+form label { font-weight:bold; display:block; margin-bottom:5px; }
+form input, form select, form button, form a.clear-btn { padding:8px 10px; border-radius:5px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
+form button { background:#007bff; color:#fff; border:none; cursor:pointer; margin-top:25px; }
+form button:hover { background:#0056b3; }
+a.clear-btn { display:inline-block; text-align:center; text-decoration:none; color:#fff; background:#6c757d; margin-top:25px; }
+a.clear-btn:hover { background:#5a6268; }
+.export-btns { text-align:right; margin-bottom:15px; }
+.export-btns a { display:inline-block; padding:8px 15px; background:#28a745; color:white; border-radius:5px; text-decoration:none; margin-left:10px; }
+.export-btns a.pdf { background:#dc3545; }
+.export-btns a:hover { opacity:0.9; }
+table { width:100%; border-collapse:collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+table th, table td { padding:10px; border:1px solid #ddd; text-align:center; }
+table th { background:#007bff; color:white; }
+table tr:nth-child(even) { background:#f2f2f2; }
+</style>
+
+<h2>Expense Report</h2>
+
+<div class="export-btns">
+    <a href="{% url 'export_report' 'excel' 'expense' %}?{{ request.GET.urlencode }}">Export Excel</a>
+    <a href="{% url 'export_report' 'pdf' 'expense' %}?{{ request.GET.urlencode }}" class="pdf">Export PDF</a>
+</div>
+
+<form method="get">
+    <label>Expense ID:</label>
+    <input type="text" name="expense_id" value="{{ selected_filters.expense_id|default:'' }}">
+
+    <label>Category:</label>
+    <select name="category" multiple>
+        {% for val,text in category_choices %}
+        <option value="{{ val }}" {% if val in selected_categories %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Title:</label>
+    <input type="text" name="title" value="{{ selected_filters.title|default:'' }}">
+
+    <label>Date From:</label>
+    <input type="date" name="date_from" value="{{ selected_filters.date_from|default:'' }}">
+    <label>Date To:</label>
+    <input type="date" name="date_to" value="{{ selected_filters.date_to|default:'' }}">
+
+    <label>Sort By:</label>
+    <select name="sort_field">
+        {% for field,text in sort_fields %}
+            <option value="{{ field }}" {% if selected_filters.sort_field == field %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+    <select name="sort_order">
+        <option value="asc" {% if selected_filters.sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+        <option value="desc" {% if selected_filters.sort_order == 'desc' %}selected{% endif %}>Descending</option>
+    </select>
+
+    <button type="submit">Apply Filters</button>
+    <a href="{% url 'expense_report' %}" class="clear-btn">Clear Filters</a>
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Category</th>
+        <th>Title</th>
+        <th>Amount</th>
+        <th>Date</th>
+    </tr>
+    {% for exp in expenses %}
+    <tr>
+        <td>{{ exp.expense_id }}</td>
+        <td>{{ exp.category }}</td>
+        <td>{{ exp.title }}</td>
+        <td>{{ exp.amount }}</td>
+        <td>{{ exp.date }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No records found</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

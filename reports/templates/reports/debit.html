@@ -1,0 +1,188 @@
+{% extends 'reports/base.html' %}
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f8f9fa;
+        padding: 20px;
+    }
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+    form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        align-items: center;
+    }
+    form label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+    form input, form select, form button, form a.clear-btn {
+        padding: 8px 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    form button {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        margin-top: 25px;
+    }
+    form button:hover {
+        background: #0056b3;
+    }
+    a.clear-btn {
+        display: inline-block;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        background: #6c757d;
+        margin-top: 25px;
+    }
+    a.clear-btn:hover {
+        background: #5a6268;
+    }
+    .export-btns {
+        margin-bottom: 15px;
+        text-align: right;
+    }
+    .export-btns a {
+        display: inline-block;
+        padding: 8px 15px;
+        background: #28a745;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        margin-left: 10px;
+    }
+    .export-btns a.pdf {
+        background: #dc3545;
+    }
+    .export-btns a:hover {
+        opacity: 0.9;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    table th, table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    table th {
+        background: #007bff;
+        color: white;
+    }
+    table tr:nth-child(even) {
+        background: #f2f2f2;
+    }
+</style>
+
+<h2>Debit Report</h2>
+
+<div class="export-btns">
+    <a href="{% url 'export_report' 'excel' 'debit' %}?{{ request.GET.urlencode }}">Export Excel</a>
+    <a href="{% url 'export_report' 'pdf' 'debit' %}?{{ request.GET.urlencode }}" class="pdf">Export PDF</a>
+</div>
+
+
+<form method="get">
+    <label>Debit ID:</label>
+    <input type="text" name="debit_id" value="{{ selected_filters.debit_id|default:'' }}">
+
+    <label>Lender Name:</label>
+    <input type="text" name="lender_name" value="{{ selected_filters.lender_name|default:'' }}">
+
+    <label>Start Date From:</label>
+    <input type="date" name="start_date_from" value="{{ selected_filters.start_date_from|default:'' }}">
+    <label>Start Date To:</label>
+    <input type="date" name="start_date_to" value="{{ selected_filters.start_date_to|default:'' }}">
+
+    <label>Maturity Date From:</label>
+    <input type="date" name="maturity_date_from" value="{{ selected_filters.maturity_date_from|default:'' }}">
+    <label>Maturity Date To:</label>
+    <input type="date" name="maturity_date_to" value="{{ selected_filters.maturity_date_to|default:'' }}">
+
+    <label>EMI Type:</label>
+    <select name="emi_type">
+        <option value="">All</option>
+        {% for val,text in emi_choices %}
+            <option value="{{ val }}" {% if selected_filters.emi_type == val %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Status:</label>
+    <select name="status" multiple>
+        {% for val,text in status_choices %}
+            <option value="{{ val }}" {% if val in selected_status %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Min Amount:</label>
+    <input type="number" step="0.01" name="min_amount" value="{{ selected_filters.min_amount|default:'' }}">
+    <label>Max Amount:</label>
+    <input type="number" step="0.01" name="max_amount" value="{{ selected_filters.max_amount|default:'' }}">
+
+    <label>Sort By:</label>
+    <select name="sort_field">
+        {% for field,text in sort_fields %}
+            <option value="{{ field }}" {% if selected_filters.sort_field == field %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+    <select name="sort_order">
+        <option value="asc" {% if selected_filters.sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+        <option value="desc" {% if selected_filters.sort_order == 'desc' %}selected{% endif %}>Descending</option>
+    </select>
+
+    <button type="submit">Apply Filters</button>
+    <a href="{% url 'debit_report' %}" class="clear-btn">Clear Filters</a>
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Lender</th>
+        <th>Amount</th>
+        <th>Interest %</th>
+        <th>Start</th>
+        <th>Maturity</th>
+        <th>Is EMI</th>
+        <th>EMI Type</th>
+        <th>EMI Period</th>
+        <th>Status</th>
+    </tr>
+    {% for d in debits %}
+    <tr>
+        <td>{{ d.debit_id }}</td>
+        <td>{{ d.lender_name }}</td>
+        <td>{{ d.amount }}</td>
+        <td>{{ d.interest_percent }}</td>
+        <td>{{ d.start_date }}</td>
+        <td>{{ d.maturity_date }}</td>
+        <td>{{ d.is_emi }}</td>
+        <td>{{ d.emi_type }}</td>
+        <td>{{ d.emi_period }}</td>
+        <td>{{ d.status }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="10">No records found</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

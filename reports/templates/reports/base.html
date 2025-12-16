@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reports App</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding:0; background:#f9f9f9; }
+        nav { background:#007bff; padding:10px; }
+        nav a { color:white; text-decoration:none; margin-right:20px; font-weight:bold; }
+        nav a.active { text-decoration:underline; }
+        .container { margin:20px auto; padding:20px; background:white; border-radius:5px; max-width:1200px; box-shadow:0 0 5px #aaa; }
+        table { width:100%; border-collapse: collapse; margin-top:20px; }
+        th, td { border:1px solid #ddd; padding:8px; text-align:left; }
+        th { background:#007bff; color:white; }
+        select, input { padding:5px; margin-right:10px; }
+        button { padding:5px 10px; }
+        .export-links { margin-top:10px; }
+        h1, h2 { margin:0 0 10px 0; }
+        .entry-links a { display:inline-block; margin:10px; padding:10px 20px; background:#007bff; color:white; border-radius:5px; text-decoration:none; }
+        .entry-links a:hover { background:#0056b3; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'debit_report' %}" class="{% if request.path == '/reports/debit/' %}active{% endif %}">Debit</a>
+        <a href="{% url 'emi_report' %}" class="{% if request.path == '/reports/emi/' %}active{% endif %}">EMI</a>
+        <a href="{% url 'income_report' %}" class="{% if request.path == '/reports/income/' %}active{% endif %}">Income</a>
+        <a href="{% url 'expense_report' %}" class="{% if request.path == '/reports/expense/' %}active{% endif %}">Expense</a>
+    </nav>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

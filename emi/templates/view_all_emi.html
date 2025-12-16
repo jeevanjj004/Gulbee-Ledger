@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>All EMIs</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+    --primary-color: #b96ecf;
+    --overdue-color: #f8d7da;
+    --paid-color: #d1e7dd;
+    --bg-light: #f5f8ff;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Poppins', sans-serif;
+    padding: 20px;
+}
+
+.card-debit {
+    margin-bottom: 20px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+.card-header {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    padding: 12px 20px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e3f2fd;
+}
+
+.overdue {
+    background-color: var(--overdue-color) !important;
+}
+
+.paid {
+    background-color: var(--paid-color) !important;
+}
+
+.bill-thumb {
+    height: 40px;
+    width: auto;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+.debit-info {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.debit-info span {
+    margin-right: 20px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .table thead { display: none; }
+    .table tbody tr { display: block; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background: #fefefe; }
+    .table tbody tr td { display: flex; justify-content: space-between; padding: 5px 0; border: none; }
+    .table tbody tr td::before { content: attr(data-label); font-weight: 600; color: #555; }
+    .bill-thumb { height: 30px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>💳 All EMIs</h2>
+        <a href="{% url 'home' %}" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+
+    {% if emis %}
+        {% regroup emis by debit as debit_list %}
+        {% for debit_group in debit_list %}
+        <div class="card card-debit">
+            <div class="card-header">
+                Debit ID: {{ debit_group.grouper.debit_id }}
+            </div>
+
+            <div class="debit-info">
+                <span><strong>Lender:</strong> {{ debit_group.grouper.lender_name }}</span>
+                <span><strong>Amount:</strong> ₹{{ debit_group.grouper.amount }}</span>
+                <span><strong>EMI Type:</strong> {{ debit_group.grouper.get_emi_type_display|default:"-" }}</span>
+                <span><strong>Start Date:</strong> {{ debit_group.grouper.start_date|date:"d M Y" }}</span>
+                <span><strong>Maturity Date:</strong> {{ debit_group.grouper.maturity_date|default:"-"|date:"d M Y" }}</span>
+            </div>
+
+            <div class="table-responsive p-3">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Seq No.</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Paid Date</th>
+                            <th>Status</th>
+                            <th>Bill</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emi in debit_group.list %}
+                        <tr class="{% if emi.status == 'OVERDUE' %}overdue{% elif emi.status == 'PAID' %}paid{% endif %}">
+                            <td data-label="Seq No.">{{ emi.sequence_number }}</td>
+                            <td data-label="Amount">₹{{ emi.amount }}</td>
+                            <td data-label="Due Date">{{ emi.due_date|date:"d M Y" }}</td>
+                            <td data-label="Paid Date">{{ emi.paid_date|default:"-" }}</td>
+                            <td data-label="Status">{{ emi.get_status_display }}</td>
+                            <td data-label="Bill">
+                                {% if emi.bill_photo %}
+                                    <a href="{{ emi.bill_photo.url }}" target="_blank">
+                                        <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
+                                    </a>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td data-label="Action">
+                                {% if emi.status != 'PAID' %}
+                                    <a href="{% url 'pay_emi' emi.emi_id %}" class="btn btn-success btn-sm">Pay</a>
+                                {% else %}
+                                    <span class="text-success fw-bold">Paid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-center text-muted">No EMIs found.</p>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

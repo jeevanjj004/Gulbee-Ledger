@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Income – Finance Manager</title>
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+:root {
+    --primary-color: #4c6ef5;
+    --secondary-color: #6c757d;
+    --bg-light: #f5f8ff;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Poppins', sans-serif;
+    padding: 20px 10px;
+}
+
+.form-container {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 30px 25px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.form-header {
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+}
+
+.form-header h3 {
+    margin: 0;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid #ced4da;
+    transition: 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: none;
+    border-color: var(--primary-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #3b5bdb;
+}
+
+.btn-back {
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 12px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+    color: white;
+}
+
+label {
+    font-weight: 500;
+    color: #555;
+}
+
+textarea.form-control {
+    resize: none;
+}
+
+.form-icon {
+    margin-right: 8px;
+}
+
+@media (max-width: 576px) {
+    .form-container { padding: 20px 15px; }
+    .btn-primary, .btn-back { font-size: 14px; padding: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h3><i class="bi bi-wallet2 form-icon"></i> Add Income</h3>
+        </div>
+
+        <form method="POST" id="addIncomeForm" novalidate>
+            {% csrf_token %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Category <span class="text-danger">*</span></label>
+                        <select name="category" id="id_category" class="form-select" required>
+                            <option value="">-- Select Category --</option>
+                            {% for c, cc in cat %}
+                                <option value="{{ c }}">{{ cc }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">Category is required.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Source <span class="text-danger">*</span></label>
+                        <input type="text" name="source" id="id_source" class="form-control" placeholder="Ex: Job, Bonus, Friend" required>
+                        <div class="invalid-feedback">Source is required.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Date <span class="text-danger">*</span></label>
+                        <input type="date" name="date" id="id_date" class="form-control" required>
+                        <div class="invalid-feedback">Date is required.</div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Amount (₹) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="amount" id="id_amount" class="form-control" placeholder="Enter amount" required>
+                        <div class="invalid-feedback">Amount is required and must be positive.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Notes (Optional)</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="Additional details..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-2">
+                <i class="bi bi-plus-circle me-2"></i> Save Income
+            </button>
+
+            <a href="{% url 'view_all_income' %}" class="btn btn-back w-100">
+                <i class="bi bi-back-circle me-2"></i> View All Income
+            </a>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const form = document.getElementById('addIncomeForm');
+const fields = ['id_category', 'id_source', 'id_date', 'id_amount'];
+
+// Show error messages only on violation
+form.addEventListener('submit', function(e) {
+    let valid = true;
+
+    fields.forEach(id => {
+        const input = document.getElementById(id);
+        input.classList.remove('is-invalid');
+
+        if (!input.value.trim() || (id === 'id_amount' && parseFloat(input.value) <= 0)) {
+            input.classList.add('is-invalid');
+            valid = false;
+        }
+    });
+
+    if (!valid) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+
+// Remove error on input change
+fields.forEach(id => {
+    const input = document.getElementById(id);
+    input.addEventListener('input', function() {
+        if (input.value.trim() && !(id === 'id_amount' && parseFloat(input.value) <= 0)) {
+            input.classList.remove('is-invalid');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

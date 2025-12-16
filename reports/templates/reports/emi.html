@@ -1,0 +1,89 @@
+{% extends 'reports/base.html' %}
+{% block content %}
+<style>
+    /* Same style as debit page */
+    body { font-family: Arial, sans-serif; background: #f8f9fa; padding: 20px; }
+    h2 { text-align: center; color: #333; }
+    form { background: #fff; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow:0 2px 6px rgba(0,0,0,0.1);
+           display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 15px; align-items: center; }
+    form label { font-weight: bold; margin-bottom: 5px; display: block; }
+    form input, form select, form button, form a.clear-btn { padding: 8px 10px; border-radius:5px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
+    form button { background:#007bff; color:#fff; border:none; cursor:pointer; margin-top:25px; }
+    form button:hover { background:#0056b3; }
+    a.clear-btn { display:inline-block; text-align:center; text-decoration:none; color:#fff; background:#6c757d; margin-top:25px; }
+    a.clear-btn:hover { background:#5a6268; }
+    .export-btns { margin-bottom:15px; text-align:right; }
+    .export-btns a { display:inline-block; padding:8px 15px; background:#28a745; color:white; border-radius:5px; text-decoration:none; margin-left:10px; }
+    .export-btns a.pdf { background:#dc3545; }
+    .export-btns a:hover { opacity:0.9; }
+    table { width:100%; border-collapse: collapse; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    table th, table td { padding:10px; border:1px solid #ddd; text-align:center; }
+    table th { background:#007bff; color:white; }
+    table tr:nth-child(even) { background:#f2f2f2; }
+</style>
+
+<h2>EMI Report</h2>
+
+<div class="export-btns">
+    <a href="{% url 'export_report' 'excel' 'emi' %}?{{ request.GET.urlencode }}">Export Excel</a>
+    <a href="{% url 'export_report' 'pdf' 'emi' %}?{{ request.GET.urlencode }}" class="pdf">Export PDF</a>
+</div>
+
+<form method="get">
+    <label>EMI ID:</label>
+    <input type="text" name="emi_id" value="{{ selected_filters.emi_id|default:'' }}">
+    <label>Debit ID:</label>
+    <input type="text" name="debit_id" value="{{ selected_filters.debit_id|default:'' }}">
+    <label>Status:</label>
+    <select name="status" multiple>
+        {% for val,text in status_choices %}
+        <option value="{{ val }}" {% if val in selected_status %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+    <label>Due Date From:</label>
+    <input type="date" name="due_from" value="{{ selected_filters.due_from|default:'' }}">
+    <label>Due Date To:</label>
+    <input type="date" name="due_to" value="{{ selected_filters.due_to|default:'' }}">
+    <label>Paid Date From:</label>
+    <input type="date" name="paid_from" value="{{ selected_filters.paid_from|default:'' }}">
+    <label>Paid Date To:</label>
+    <input type="date" name="paid_to" value="{{ selected_filters.paid_to|default:'' }}">
+
+    <label>Sort By:</label>
+    <select name="sort_field">
+        {% for field,text in sort_fields %}
+            <option value="{{ field }}" {% if selected_filters.sort_field == field %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+    </select>
+    <select name="sort_order">
+        <option value="asc" {% if selected_filters.sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+        <option value="desc" {% if selected_filters.sort_order == 'desc' %}selected{% endif %}>Descending</option>
+    </select>
+
+    <button type="submit">Apply Filters</button>
+    <a href="{% url 'emi_report' %}" class="clear-btn">Clear Filters</a>
+</form>
+
+<table>
+    <tr>
+        <th>EMI ID</th>
+        <th>Debit ID</th>
+        <th>Amount</th>
+        <th>Due Date</th>
+        <th>Paid Date</th>
+        <th>Status</th>
+    </tr>
+    {% for e in emis %}
+    <tr>
+        <td>{{ e.emi_id }}</td>
+        <td>{{ e.debit.debit_id }}</td>
+        <td>{{ e.amount }}</td>
+        <td>{{ e.due_date }}</td>
+        <td>{{ e.paid_date }}</td>
+        <td>{{ e.status }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No records found</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reports Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background:#f9f9f9; }
+        h2 { background:#007bff; color:white; padding:10px; border-radius:5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom:30px; }
+        th, td { border:1px solid #ddd; padding:8px; text-align:left; }
+        th { background:#007bff; color:white; }
+        .filter-section { margin-bottom: 20px; background:white; padding:15px; border-radius:5px; box-shadow:0 0 5px #aaa; }
+        select { padding:5px; margin-right:10px; min-width:150px; }
+        button { padding:5px 10px; margin-left:5px; }
+        .export-links { margin-top:10px; }
+    </style>
+</head>
+<body>
+    <h1>Reports Dashboard</h1>
+
+    <form method="get" class="filter-section">
+        <h3>Filters</h3>
+        <label>Debit Status:</label>
+        <select name="debit_status" multiple>
+            {% for val, text in debit_status_choices %}
+                <option value="{{ val }}" {% if val in filter_values.getlist('debit_status') %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+
+        <label>EMI Status:</label>
+        <select name="emi_status" multiple>
+            {% for val, text in emi_status_choices %}
+                <option value="{{ val }}" {% if val in filter_values.getlist('emi_status') %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Income Category:</label>
+        <select name="income_category" multiple>
+            {% for val, text in income_category_choices %}
+                <option value="{{ val }}" {% if val in filter_values.getlist('income_category') %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+
+        <label>Expense Category:</label>
+        <select name="expense_category" multiple>
+            {% for val, text in expense_category_choices %}
+                <option value="{{ val }}" {% if val in filter_values.getlist('expense_category') %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+
+    <h2>Debit Report</h2>
+    <div class="export-links">
+        <a href="{% url 'export_report' 'excel' 'debit' %}">Download Excel</a> | 
+        <a href="{% url 'export_report' 'pdf' 'debit' %}">Download PDF</a>
+    </div>
+    <table>
+        <tr>
+            <th>ID</th><th>Lender</th><th>Amount</th><th>Interest %</th><th>Start</th><th>Maturity</th><th>Is EMI</th><th>EMI Type</th><th>EMI Period</th><th>Status</th>
+        </tr>
+        {% for d in debits %}
+        <tr>
+            <td>{{ d.debit_id }}</td>
+            <td>{{ d.lender_name }}</td>
+            <td>{{ d.amount }}</td>
+            <td>{{ d.interest_percent }}</td>
+            <td>{{ d.start_date }}</td>
+            <td>{{ d.maturity_date }}</td>
+            <td>{{ d.is_emi }}</td>
+            <td>{{ d.emi_type }}</td>
+            <td>{{ d.emi_period }}</td>
+            <td>{{ d.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>EMI Report</h2>
+    <div class="export-links">
+        <a href="{% url 'export_report' 'excel' 'emi' %}">Download Excel</a> | 
+        <a href="{% url 'export_report' 'pdf' 'emi' %}">Download PDF</a>
+    </div>
+    <table>
+        <tr>
+            <th>ID</th><th>Debit</th><th>No.</th><th>Amount</th><th>Due Date</th><th>Paid Date</th><th>Status</th>
+        </tr>
+        {% for e in emis %}
+        <tr>
+            <td>{{ e.emi_id }}</td>
+            <td>{{ e.debit }}</td>
+            <td>{{ e.sequence_number }}</td>
+            <td>{{ e.amount }}</td>
+            <td>{{ e.due_date }}</td>
+            <td>{{ e.paid_date }}</td>
+            <td>{{ e.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Income Report</h2>
+    <div class="export-links">
+        <a href="{% url 'export_report' 'excel' 'income' %}">Download Excel</a> | 
+        <a href="{% url 'export_report' 'pdf' 'income' %}">Download PDF</a>
+    </div>
+    <table>
+        <tr>
+            <th>ID</th><th>Category</th><th>Source</th><th>Date</th><th>Amount</th>
+        </tr>
+        {% for i in incomes %}
+        <tr>
+            <td>{{ i.income_id }}</td>
+            <td>{{ i.category }}</td>
+            <td>{{ i.source }}</td>
+            <td>{{ i.date }}</td>
+            <td>{{ i.amount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Expense Report</h2>
+    <div class="export-links">
+        <a href="{% url 'export_report' 'excel' 'expense' %}">Download Excel</a> | 
+        <a href="{% url 'export_report' 'pdf' 'expense' %}">Download PDF</a>
+    </div>
+    <table>
+        <tr>
+            <th>ID</th><th>Title</th><th>Category</th><th>Date</th><th>Amount</th><th>Paid To</th>
+        </tr>
+        {% for ex in expenses %}
+        <tr>
+            <td>{{ ex.expense_id }}</td>
+            <td>{{ ex.title }}</td>
+            <td>{{ ex.category }}</td>
+            <td>{{ ex.date }}</td>
+            <td>{{ ex.amount }}</td>
+            <td>{{ ex.paid_to }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

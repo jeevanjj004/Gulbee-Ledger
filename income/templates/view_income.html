@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Income Records – Finance Manager</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+:root {
+    --primary-color: #4c6ef5;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --bg-light: #f5f8ff;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Poppins', sans-serif;
+    padding: 20px 10px;
+}
+
+.table-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.category-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.GIFT { background: #e91e63; color: white; }
+.SALARY { background: #2196f3; color: white; }
+.OTHERS { background: #9c27b0; color: white; }
+
+.total-income {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e7f1ff;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+.search-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 576px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .table-responsive { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="container py-3">
+
+    <!-- Back & Add Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <a href="{% url 'home' %}" class="btn btn-secondary mb-2">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to Home
+        </a>
+        <a href="{% url 'add_income' %}" class="btn btn-success mb-2">
+            <i class="bi bi-plus-circle me-1"></i> Add Income
+        </a>
+    </div>
+
+    <!-- Header -->
+    <h2 class="fw-bold mb-2">💰 Income Records of {{ request.user.first_name }}</h2>
+    <p class="total-income mb-3">Total Income: ₹ {{ total_income }}</p>
+
+    <!-- Search -->
+    <div class="card p-3 mb-3 search-card">
+        <form method="GET" class="d-flex flex-wrap gap-2">
+            <input type="text" name="search" class="form-control flex-grow-1" placeholder="Search by source, category, notes...">
+            <button class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="card table-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Source</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for income in income %}
+                    <tr>
+                        <td>{{ income.income_id }}</td>
+                        <td class="fw-semibold">{{ income.source }}</td>
+                        <td><span class="category-badge {{ income.category }}">{{ income.get_category_display }}</span></td>
+                        <td>{{ income.date|date:"d M Y" }}</td>
+                        <td class="fw-bold text-success">₹ {{ income.amount }}</td>
+                        <td>{{ income.notes|default:"-" }}</td>
+                        <td class="d-flex gap-1 flex-wrap">
+                            <a href="{% url 'update_income' income.income_id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a href="{% url 'delete_income' income.income_id %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-3 text-muted">No income records found.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

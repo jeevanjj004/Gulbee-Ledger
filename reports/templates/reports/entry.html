@@ -1,0 +1,11 @@
+{% extends 'reports/base.html' %}
+{% block content %}
+<h1>Reports Dashboard</h1>
+<p>Select a report to view, filter, sort, and export:</p>
+<div class="entry-links">
+    <a href="{% url 'debit_report' %}">Debit Report</a>
+    <a href="{% url 'emi_report' %}">EMI Report</a>
+    <a href="{% url 'income_report' %}">Income Report</a>
+    <a href="{% url 'expense_report' %}">Expense Report</a>
+</div>
+{% endblock %}

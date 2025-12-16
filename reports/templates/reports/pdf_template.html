@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report_type|title }} Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size:12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom:20px; }
+        th, td { border:1px solid #333; padding:5px; text-align:left; }
+        th { background:#333; color:white; }
+        h2 { text-align:center; }
+    </style>
+</head>
+<body>
+    <h2>{{ report_type|title }} Report</h2>
+    <table>
+        <tr>
+            {% for col in columns %}
+            <th>{{ col|title }}</th>
+            {% endfor %}
+        </tr>
+        {% for row in data %}
+        <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Income Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:20px; }
+        h2 { text-align:center; color:#28a745; }
+        table { width:100%; border-collapse: collapse; margin-top:20px; }
+        th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+        th { background:#28a745; color:white; }
+    </style>
+</head>
+<body>
+<h2>Income Report</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Income ID</th>
+            <th>Source</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in incomes %}
+        <tr>
+            <td>{{ i.income_id }}</td>
+            <td>{{ i.source }}</td>
+            <td>{{ i.amount }}</td>
+            <td>{{ i.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

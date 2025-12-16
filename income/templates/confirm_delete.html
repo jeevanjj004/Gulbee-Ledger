@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirm Delete Income – Finance Manager</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+:root {
+    --primary-color: #4c6ef5;
+    --danger-color: #dc3545;
+    --secondary-color: #6c757d;
+    --bg-light: #f5f8ff;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Poppins', sans-serif;
+    padding: 20px 10px;
+}
+
+.confirm-card {
+    max-width: 500px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.confirm-card h2 {
+    color: var(--danger-color);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.confirm-card p {
+    font-size: 16px;
+    margin: 8px 0;
+}
+
+.btn-action {
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    width: 45%;
+    margin: 5px;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #b02a37;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+@media (max-width: 576px) {
+    .confirm-card { padding: 25px 15px; }
+    .btn-action { width: 100%; margin: 10px 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="confirm-card">
+    <h2><i class="bi bi-exclamation-triangle-fill"></i> Confirm Delete</h2>
+    <p><strong>ID:</strong> {{ income.income_id }}</p>
+    <p><strong>Source:</strong> {{ income.source }}</p>
+    <p><strong>Amount:</strong> ₹ {{ income.amount }}</p>
+
+    <form method="post" class="d-flex justify-content-center flex-wrap mt-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-action">
+            <i class="bi bi-trash-fill me-1"></i> Yes, Delete
+        </button>
+        <a href="{% url 'view_all_income' %}" class="btn btn-secondary btn-action">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+        </a>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

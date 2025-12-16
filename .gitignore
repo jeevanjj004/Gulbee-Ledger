@@ -1,0 +1,64 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ======================
+# Virtual Environment
+# ======================
+venv/
+.env/
+.env.*
+
+# ======================
+# Django
+# ======================
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# ======================
+# Migrations (optional)
+# ======================
+# Uncomment ONLY if you don't want migrations tracked
+# **/migrations/
+# **/migrations/*.py
+# !**/migrations/__init__.py
+
+# ======================
+# Secrets & Settings
+# ======================
+settings_local.py
+local_settings.py
+.env.production
+.env.development
+
+# ======================
+# IDE / Editor
+# ======================
+.vscode/
+.idea/
+*.swp
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Build / Cache
+# ======================
+.pytest_cache/
+.mypy_cache/
+coverage/
+htmlcov/
+
+# ======================
+# Frontend (if Vite used)
+# ======================
+node_modules/
+dist/
