@@ -2,158 +2,1537 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>All EMIs</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-:root {
-    --primary-color: #b96ecf;
-    --overdue-color: #f8d7da;
-    --paid-color: #d1e7dd;
-    --bg-light: #f5f8ff;
-}
-
-body {
-    background-color: var(--bg-light);
-    font-family: 'Poppins', sans-serif;
-    padding: 20px;
-}
-
-.card-debit {
-    margin-bottom: 20px;
-    border-radius: 15px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-    background: #fff;
-}
-
-.card-header {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: 600;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    padding: 12px 20px;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #e3f2fd;
-}
-
-.overdue {
-    background-color: var(--overdue-color) !important;
-}
-
-.paid {
-    background-color: var(--paid-color) !important;
-}
-
-.bill-thumb {
-    height: 40px;
-    width: auto;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-}
-
-.btn-sm {
-    font-size: 0.8rem;
-    padding: 4px 8px;
-}
-
-.debit-info {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.debit-info span {
-    margin-right: 20px;
-    font-weight: 500;
-}
-
-@media (max-width: 768px) {
-    .table thead { display: none; }
-    .table tbody tr { display: block; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; background: #fefefe; }
-    .table tbody tr td { display: flex; justify-content: space-between; padding: 5px 0; border: none; }
-    .table tbody tr td::before { content: attr(data-label); font-weight: 600; color: #555; }
-    .bill-thumb { height: 30px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All EMIs – Expense Manager</title>
+    
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= CSS VARIABLES ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #162447;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-hover: rgba(30, 41, 59, 0.9);
+            
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.1);
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.15);
+            --info: #0ea5e9;
+            --info-light: rgba(14, 165, 233, 0.15);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border: #334155;
+            --border-light: rgba(51, 65, 85, 0.3);
+            --shadow: rgba(0, 0, 0, 0.25);
+            --shadow-lg: rgba(0, 0, 0, 0.35);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ================= BASE STYLES ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* ================= TOP NAVIGATION ================= */
+        .topnav {
+            background-color: var(--bg-elevated);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(22, 36, 71, 0.95);
+        }
+        
+        .brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .brand-icon {
+            font-size: 1.8rem;
+        }
+        
+        .menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .menu-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            color: var(--text-main);
+        }
+        
+        .menu-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .logout-link {
+            color: var(--danger);
+            margin-left: 0.5rem;
+        }
+        
+        .logout-link:hover {
+            color: #fca5a5;
+        }
+        
+        /* ================= PAGE CONTENT ================= */
+        .page-container {
+            padding: 2rem;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(to right, #ffffff, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .page-title i {
+            color: var(--primary);
+        }
+        
+        /* ================= STATUS FILTER ================= */
+        .status-filter {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .status-filter-btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+        
+        .status-filter-btn.active {
+            color: white;
+        }
+        
+        .status-filter-btn.overdue {
+            border-color: var(--danger);
+        }
+        
+        .status-filter-btn.overdue.active {
+            background: var(--danger);
+        }
+        
+        .status-filter-btn.pending {
+            border-color: var(--warning);
+        }
+        
+        .status-filter-btn.pending.active {
+            background: var(--warning);
+        }
+        
+        .status-filter-btn.paid {
+            border-color: var(--success);
+        }
+        
+        .status-filter-btn.paid.active {
+            background: var(--success);
+        }
+        
+        /* ================= DEBIT CARDS ================= */
+        .debit-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .debit-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 16px var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .debit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px var(--shadow-lg);
+        }
+        
+        /* Debit Header with Status Indicator */
+        .debit-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .debit-header.overdue {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+        
+        .debit-header.pending {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        }
+        
+        .debit-header.paid {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+        }
+        
+        .debit-header-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .debit-header-title i {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .debit-status-badge {
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .debit-info-bar {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .debit-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-value.amount {
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        /* EMI Status Summary */
+        .emi-summary {
+            display: flex;
+            gap: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .summary-count {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .overdue-count {
+            background: var(--danger);
+        }
+        
+        .pending-count {
+            background: var(--warning);
+        }
+        
+        .paid-count {
+            background: var(--success);
+        }
+        
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        /* EMI Table */
+        .emi-table-container {
+            overflow-x: auto;
+            padding: 0;
+        }
+        
+        .emi-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        .emi-table thead {
+            background: rgba(30, 41, 59, 0.9);
+        }
+        
+        .emi-table th {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .emi-table tbody tr {
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        
+        .emi-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .emi-table td {
+            padding: 1.25rem;
+            color: var(--text-main);
+            vertical-align: middle;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+            transition: var(--transition);
+        }
+        
+        .status-paid {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        
+        .status-overdue {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2);
+            }
+            70% {
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        /* Bill Thumbnail */
+        .bill-thumb {
+            height: 40px;
+            width: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            object-fit: cover;
+        }
+        
+        .bill-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bill-empty {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .btn-pay {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            border: none;
+        }
+        
+        .btn-pay:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-paid {
+            color: var(--success);
+            font-weight: 700;
+            pointer-events: none;
+        }
+        
+        /* Date Cells */
+        .date-cell {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .date-due {
+            color: var(--text-main);
+        }
+        
+        .date-overdue {
+            color: var(--danger);
+            font-weight: 700;
+        }
+        
+        .date-paid {
+            color: var(--success);
+        }
+        
+        .date-empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        /* Back Button */
+        .back-btn {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            margin-bottom: 2rem;
+        }
+        
+        .back-btn:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+            color: var(--text-light);
+            text-decoration: none;
+        }
+        
+        /* ================= EMPTY STATE ================= */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state-title {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .empty-state-text {
+            color: var(--text-muted);
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* ================= MOBILE RESPONSIVENESS ================= */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        /* Small screens */
+        @media (max-width: 768px) {
+            .topnav {
+                padding: 0.75rem 1rem;
+                flex-direction: row;
+                gap: 1rem;
+            }
+            
+            .brand {
+                font-size: 1.2rem;
+            }
+            
+            .brand-icon {
+                font-size: 1.5rem;
+            }
+            
+            .menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-elevated);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            .menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .menu-link {
+                padding: 0.75rem;
+                border-radius: var(--radius);
+                margin-bottom: 0.25rem;
+            }
+            
+            .menu-link:hover {
+                background: var(--bg-surface);
+            }
+            
+            .menu-link.active::after {
+                display: none;
+            }
+            
+            .menu-link.active {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+            
+            .page-container {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .status-filter {
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            
+            .status-filter-btn {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .debit-header {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+            
+            .debit-header-title {
+                font-size: 1.1rem;
+            }
+            
+            .debit-info-bar {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+            
+            .emi-summary {
+                padding: 0.75rem 1rem;
+                gap: 1rem;
+                justify-content: center;
+            }
+            
+            .info-value {
+                font-size: 0.95rem;
+            }
+            
+            /* Mobile table layout */
+            .emi-table-container {
+                padding: 0.5rem;
+            }
+            
+            .emi-table {
+                min-width: 600px;
+            }
+            
+            .emi-table td {
+                padding: 0.75rem;
+            }
+            
+            .status-badge {
+                min-width: 70px;
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .bill-thumb {
+                height: 30px;
+            }
+            
+            .action-btn {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+            
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Very small screens - mobile table cards */
+        @media (max-width: 640px) {
+            .emi-table {
+                display: block;
+            }
+            
+            .emi-table thead {
+                display: none;
+            }
+            
+            .emi-table tbody tr {
+                display: block;
+                margin-bottom: 1rem;
+                background: rgba(30, 41, 59, 0.5);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 1rem;
+            }
+            
+            .emi-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .emi-table td:last-child {
+                border-bottom: none;
+            }
+            
+            .emi-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                min-width: 100px;
+            }
+            
+            .emi-table td[data-label="Action"] {
+                justify-content: flex-end;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 1rem;
+            }
+            
+            .bill-thumb {
+                height: 35px;
+            }
+            
+            .status-badge {
+                align-self: flex-start;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .brand {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .brand-icon {
+                font-size: 1.2rem;
+            }
+            
+            .page-title {
+                font-size: 1.3rem;
+            }
+            
+            .debit-header-title {
+                font-size: 1rem;
+            }
+            
+            .info-label {
+                font-size: 0.75rem;
+            }
+            
+            .info-value {
+                font-size: 0.9rem;
+            }
+            
+            .empty-state-icon {
+                font-size: 3rem;
+            }
+            
+            .empty-state-title {
+                font-size: 1.3rem;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .page-container {
+                padding: 1rem;
+            }
+            
+            .debit-card {
+                margin-bottom: 1rem;
+            }
+            
+            .debit-header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .emi-table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-
-<div class="container py-4">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>💳 All EMIs</h2>
-        <a href="{% url 'home' %}" class="btn btn-secondary">← Back to Dashboard</a>
+    <!-- TOP NAVIGATION -->
+    <div class="topnav">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <i class="fas fa-chart-pie brand-icon"></i>
+            GULBEE LEDGER
+        </div>
+        <div class="menu" id="mainMenu">
+            <a href="{% url 'home' %}" class="menu-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'view_all_income' %}" class="menu-link">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Income</span>
+            </a>
+            <a href="{% url 'view_all_expense' %}" class="menu-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Expense</span>
+            </a>
+            <a href="{% url 'view_all_emi' %}" class="menu-link active">
+                <i class="fas fa-credit-card"></i>
+                <span>EMI</span>
+            </a>
+            <a href="{% url 'view_all' %}" class="menu-link">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Debit</span>
+            </a>
+            <a href="{% url 'report_home' %}" class="menu-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{% url 'login' %}" class="menu-link logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
     </div>
 
-    {% if emis %}
-        {% regroup emis by debit as debit_list %}
-        {% for debit_group in debit_list %}
-        <div class="card card-debit">
-            <div class="card-header">
-                Debit ID: {{ debit_group.grouper.debit_id }}
-            </div>
-
-            <div class="debit-info">
-                <span><strong>Lender:</strong> {{ debit_group.grouper.lender_name }}</span>
-                <span><strong>Amount:</strong> ₹{{ debit_group.grouper.amount }}</span>
-                <span><strong>EMI Type:</strong> {{ debit_group.grouper.get_emi_type_display|default:"-" }}</span>
-                <span><strong>Start Date:</strong> {{ debit_group.grouper.start_date|date:"d M Y" }}</span>
-                <span><strong>Maturity Date:</strong> {{ debit_group.grouper.maturity_date|default:"-"|date:"d M Y" }}</span>
-            </div>
-
-            <div class="table-responsive p-3">
-                <table class="table table-hover mb-0 align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Seq No.</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Paid Date</th>
-                            <th>Status</th>
-                            <th>Bill</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for emi in debit_group.list %}
-                        <tr class="{% if emi.status == 'OVERDUE' %}overdue{% elif emi.status == 'PAID' %}paid{% endif %}">
-                            <td data-label="Seq No.">{{ emi.sequence_number }}</td>
-                            <td data-label="Amount">₹{{ emi.amount }}</td>
-                            <td data-label="Due Date">{{ emi.due_date|date:"d M Y" }}</td>
-                            <td data-label="Paid Date">{{ emi.paid_date|default:"-" }}</td>
-                            <td data-label="Status">{{ emi.get_status_display }}</td>
-                            <td data-label="Bill">
-                                {% if emi.bill_photo %}
-                                    <a href="{{ emi.bill_photo.url }}" target="_blank">
-                                        <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
-                                    </a>
-                                {% else %}-{% endif %}
-                            </td>
-                            <td data-label="Action">
-                                {% if emi.status != 'PAID' %}
-                                    <a href="{% url 'pay_emi' emi.emi_id %}" class="btn btn-success btn-sm">Pay</a>
-                                {% else %}
-                                    <span class="text-success fw-bold">Paid</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- MAIN CONTENT -->
+    <div class="page-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-credit-card"></i>
+                <br>
+                All EMI Installments
+            </h1>
         </div>
-        {% endfor %}
-    {% else %}
-        <p class="text-center text-muted">No EMIs found.</p>
-    {% endif %}
 
-</div>
+        <!-- Back Button -->
+        <a href="{% url 'home' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Status Filter -->
+        <div class="status-filter" id="statusFilter">
+            <button class="status-filter-btn overdue active" data-status="all">
+                <i class="fas fa-filter"></i>
+                All
+            </button>
+            <button class="status-filter-btn overdue" data-status="overdue">
+                <i class="fas fa-exclamation-triangle"></i>
+                Overdue
+            </button>
+            <button class="status-filter-btn pending" data-status="pending">
+                <i class="fas fa-clock"></i>
+                Pending
+            </button>
+            <button class="status-filter-btn paid" data-status="paid">
+                <i class="fas fa-check-circle"></i>
+                Paid
+            </button>
+        </div>
+
+        <!-- Debit Cards with EMIs -->
+        {% if emis %}
+            <div class="debit-cards-container" id="debitCardsContainer">
+                {# First, group EMIs by debit #}
+                {% regroup emis by debit as debit_groups %}
+                
+                {# Create a list to store debit info for sorting #}
+                {% for debit_group in debit_groups %}
+                    {# Calculate status counts for this debit #}
+                    {% with overdue_count=0 pending_count=0 paid_count=0 %}
+                        {% for emi in debit_group.list %}
+                            {% if emi.status == 'OVERDUE' %}
+                                {% with overdue_count=overdue_count|add:1 %}
+                                {% endwith %}
+                            {% elif emi.status == 'PAID' %}
+                                {% with paid_count=paid_count|add:1 %}
+                                {% endwith %}
+                            {% else %}
+                                {% with pending_count=pending_count|add:1 %}
+                                {% endwith %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {# Determine debit status #}
+                        {% if overdue_count > 0 %}
+                            {% with debit_status='overdue' %}
+                            {% endwith %}
+                        {% elif pending_count > 0 %}
+                            {% with debit_status='pending' %}
+                            {% endwith %}
+                        {% else %}
+                            {% with debit_status='paid' %}
+                            {% endwith %}
+                        {% endif %}
+                        
+                        {# Create the debit card with data attributes for sorting #}
+                        <div class="debit-card" data-debit-id="{{ debit_group.grouper.debit_id }}" 
+                             data-debit-status="{{ debit_status }}"
+                             data-overdue-count="{{ overdue_count }}"
+                             data-pending-count="{{ pending_count }}"
+                             data-paid-count="{{ paid_count }}">
+                            
+                            {% if debit_status == 'overdue' %}
+                                <div class="debit-header overdue">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-status-badge">
+                                        OVERDUE
+                                    </div>
+                                </div>
+                            {% elif debit_status == 'pending' %}
+                                <div class="debit-header pending">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-clock"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-status-badge">
+                                        PENDING
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="debit-header paid">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-status-badge">
+                                        PAID
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <!-- EMI Summary -->
+                            <div class="emi-summary">
+                                <div class="summary-item">
+                                    <div class="summary-count overdue-count">{{ overdue_count }}</div>
+                                    <span class="summary-label">Overdue</span>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-count pending-count">{{ pending_count }}</div>
+                                    <span class="summary-label">Pending</span>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-count paid-count">{{ paid_count }}</div>
+                                    <span class="summary-label">Paid</span>
+                                </div>
+                            </div>
+
+                            <!-- Debit Info -->
+                            <div class="debit-info-bar">
+                                <div class="debit-info-item">
+                                    <span class="info-label">Loan Amount</span>
+                                    <span class="info-value amount">
+                                        <i class="fas fa-indian-rupee-sign"></i>
+                                        {{ debit_group.grouper.amount }}
+                                    </span>
+                                </div>
+                                
+                                <div class="debit-info-item">
+                                    <span class="info-label">EMI Type</span>
+                                    <span class="info-value">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        {{ debit_group.grouper.get_emi_type_display|default:"-" }}
+                                    </span>
+                                </div>
+                                
+                                <div class="debit-info-item">
+                                    <span class="info-label">Start Date</span>
+                                    <span class="info-value">
+                                        <i class="fas fa-play-circle"></i>
+                                        {{ debit_group.grouper.start_date|date:"d M Y" }}
+                                    </span>
+                                </div>
+                                
+                                <div class="debit-info-item">
+                                    <span class="info-label">Maturity Date</span>
+                                    <span class="info-value">
+                                        <i class="fas fa-flag-checkered"></i>
+                                        {{ debit_group.grouper.maturity_date|default:"-"|date:"d M Y" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- EMI Table -->
+                            <div class="emi-table-container">
+                                <table class="emi-table">
+                                    <thead>
+                                        <tr>
+                                            <th data-label="Seq No.">Seq No.</th>
+                                            <th data-label="Amount">Amount</th>
+                                            <th data-label="Due Date">Due Date</th>
+                                            <th data-label="Paid Date">Paid Date</th>
+                                            <th data-label="Status">Status</th>
+                                            <th data-label="Bill">Bill</th>
+                                            <th data-label="Action">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {# First show OVERDUE #}
+                                        {% for emi in debit_group.list %}
+                                            {% if emi.status == 'OVERDUE' %}
+                                                <tr class="emi-row" data-emi-status="overdue">
+                                                    <td data-label="Seq No." class="sequence-cell">
+                                                        #{{ emi.sequence_number }}
+                                                    </td>
+                                                    <td data-label="Amount" class="amount-cell">
+                                                        ₹{{ emi.amount }}
+                                                    </td>
+                                                    <td data-label="Due Date" class="date-cell date-overdue">
+                                                        <i class="fas fa-exclamation-circle"></i> {{ emi.due_date|date:"d M Y" }}
+                                                    </td>
+                                                    <td data-label="Paid Date" class="date-cell date-empty">
+                                                        -
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        <span class="status-badge status-overdue">
+                                                            <i class="fas fa-exclamation-triangle"></i> Overdue
+                                                        </span>
+                                                    </td>
+                                                    <td data-label="Bill">
+                                                        {% if emi.bill_photo %}
+                                                            <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
+                                                                <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="bill-empty">No bill</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td data-label="Action">
+                                                        <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
+                                                            <i class="fas fa-money-bill-wave"></i>
+                                                            Pay
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {# Then show PENDING #}
+                                        {% for emi in debit_group.list %}
+                                            {% if emi.status == 'PENDING' %}
+                                                <tr class="emi-row" data-emi-status="pending">
+                                                    <td data-label="Seq No." class="sequence-cell">
+                                                        #{{ emi.sequence_number }}
+                                                    </td>
+                                                    <td data-label="Amount" class="amount-cell">
+                                                        ₹{{ emi.amount }}
+                                                    </td>
+                                                    <td data-label="Due Date" class="date-cell date-due">
+                                                        <i class="fas fa-calendar-day"></i> {{ emi.due_date|date:"d M Y" }}
+                                                    </td>
+                                                    <td data-label="Paid Date" class="date-cell date-empty">
+                                                        -
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        <span class="status-badge status-pending">
+                                                            <i class="fas fa-clock"></i> Pending
+                                                        </span>
+                                                    </td>
+                                                    <td data-label="Bill">
+                                                        {% if emi.bill_photo %}
+                                                            <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
+                                                                <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="bill-empty">No bill</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td data-label="Action">
+                                                        <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
+                                                            <i class="fas fa-money-bill-wave"></i>
+                                                            Pay
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {# Finally show PAID #}
+                                        {% for emi in debit_group.list %}
+                                            {% if emi.status == 'PAID' %}
+                                                <tr class="emi-row" data-emi-status="paid">
+                                                    <td data-label="Seq No." class="sequence-cell">
+                                                        #{{ emi.sequence_number }}
+                                                    </td>
+                                                    <td data-label="Amount" class="amount-cell">
+                                                        ₹{{ emi.amount }}
+                                                    </td>
+                                                    <td data-label="Due Date" class="date-cell date-due">
+                                                        <i class="fas fa-calendar-day"></i> {{ emi.due_date|date:"d M Y" }}
+                                                    </td>
+                                                    <td data-label="Paid Date" class="date-cell date-paid">
+                                                        <i class="fas fa-calendar-check"></i> {{ emi.paid_date|date:"d M Y" }}
+                                                    </td>
+                                                    <td data-label="Status">
+                                                        <span class="status-badge status-paid">
+                                                            <i class="fas fa-check-circle"></i> Paid
+                                                        </span>
+                                                    </td>
+                                                    <td data-label="Bill">
+                                                        {% if emi.bill_photo %}
+                                                            <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
+                                                                <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
+                                                            </a>
+                                                        {% else %}
+                                                            <span class="bill-empty">No bill</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td data-label="Action">
+                                                        <span class="action-btn btn-paid">
+                                                            <i class="fas fa-check-circle"></i>
+                                                            Paid
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3 class="empty-state-title">No EMIs Found</h3>
+                <p class="empty-state-text">
+                    You don't have any EMI installments yet. Start by adding a debit with EMI schedule.
+                </p>
+                <a href="{% url 'view_all' %}" class="back-btn" style="margin-top: 1.5rem;">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New Debit
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mainMenu = document.getElementById('mainMenu');
+            const statusFilter = document.getElementById('statusFilter');
+            const statusFilterBtns = document.querySelectorAll('.status-filter-btn');
+            const debitCardsContainer = document.getElementById('debitCardsContainer');
+            
+            // Toggle mobile menu
+            mobileMenuToggle.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+                const icon = this.querySelector('i');
+                if (mainMenu.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking a link
+            const menuLinks = document.querySelectorAll('.menu-link');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+            
+            // Sort debit cards on page load
+            sortDebitCards();
+            
+            // Status Filter Functionality
+            statusFilterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    
+                    // Update active button
+                    statusFilterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Filter debit cards
+                    const debitCards = document.querySelectorAll('.debit-card');
+                    debitCards.forEach(card => {
+                        const cardStatus = card.getAttribute('data-debit-status');
+                        
+                        if (status === 'all') {
+                            card.style.display = 'block';
+                        } else if (cardStatus === status) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                        
+                        // Add animation
+                        if (card.style.display === 'block') {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(20px)';
+                            
+                            setTimeout(() => {
+                                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, 50);
+                        }
+                    });
+                });
+            });
+            
+            // Highlight overdue EMIs
+            highlightOverdueEmis();
+            
+            // Add table row animations
+            const tableRows = document.querySelectorAll('.emi-table tbody tr');
+            tableRows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, 100 + (index * 30));
+            });
+            
+            // Add data labels for mobile table
+            if (window.innerWidth <= 640) {
+                const tableCells = document.querySelectorAll('.emi-table td');
+                const headers = Array.from(document.querySelectorAll('.emi-table th')).map(th => th.textContent.trim());
+                
+                tableCells.forEach((cell, index) => {
+                    const headerIndex = index % headers.length;
+                    cell.setAttribute('data-label', headers[headerIndex]);
+                });
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+                
+                // Re-apply data labels if switching to mobile
+                if (window.innerWidth <= 640) {
+                    const tableCells = document.querySelectorAll('.emi-table td');
+                    const headers = Array.from(document.querySelectorAll('.emi-table th')).map(th => th.textContent.trim());
+                    
+                    tableCells.forEach((cell, index) => {
+                        const headerIndex = index % headers.length;
+                        cell.setAttribute('data-label', headers[headerIndex]);
+                    });
+                }
+            });
+            
+            function sortDebitCards() {
+                const container = document.querySelector('.debit-cards-container');
+                if (!container) return;
+                
+                const cards = Array.from(container.querySelectorAll('.debit-card'));
+                
+                // Sort cards by: overdue > pending > paid
+                cards.sort((a, b) => {
+                    const statusA = a.getAttribute('data-debit-status');
+                    const statusB = b.getAttribute('data-debit-status');
+                    
+                    // Status priority: overdue (1) > pending (2) > paid (3)
+                    const statusPriority = {
+                        'overdue': 1,
+                        'pending': 2,
+                        'paid': 3
+                    };
+                    
+                    // First sort by status priority
+                    if (statusPriority[statusA] !== statusPriority[statusB]) {
+                        return statusPriority[statusA] - statusPriority[statusB];
+                    }
+                    
+                    // If same status, sort by count of that status (higher count first)
+                    if (statusA === 'overdue') {
+                        const overdueA = parseInt(a.getAttribute('data-overdue-count') || 0);
+                        const overdueB = parseInt(b.getAttribute('data-overdue-count') || 0);
+                        return overdueB - overdueA;
+                    } else if (statusA === 'pending') {
+                        const pendingA = parseInt(a.getAttribute('data-pending-count') || 0);
+                        const pendingB = parseInt(b.getAttribute('data-pending-count') || 0);
+                        return pendingB - pendingA;
+                    } else {
+                        const paidA = parseInt(a.getAttribute('data-paid-count') || 0);
+                        const paidB = parseInt(b.getAttribute('data-paid-count') || 0);
+                        return paidB - paidA;
+                    }
+                });
+                
+                // Reorder cards in container
+                cards.forEach(card => {
+                    container.appendChild(card);
+                });
+                
+                // Add animation to reordered cards
+                setTimeout(() => {
+                    cards.forEach((card, index) => {
+                        card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                        card.style.transform = 'translateY(0)';
+                        card.style.opacity = '1';
+                    });
+                }, 50);
+            }
+            
+            function highlightOverdueEmis() {
+                const today = new Date();
+                const dueDateCells = document.querySelectorAll('.date-due, .date-overdue');
+                
+                dueDateCells.forEach(cell => {
+                    const dateText = cell.textContent.trim();
+                    // Extract date from text (assuming format like "15 Dec 2023")
+                    const dateMatch = dateText.match(/(\d{1,2})\s+(\w{3})\s+(\d{4})/);
+                    
+                    if (dateMatch) {
+                        const day = parseInt(dateMatch[1]);
+                        const month = dateMatch[2];
+                        const year = parseInt(dateMatch[3]);
+                        
+                        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                        const monthIndex = monthNames.indexOf(month);
+                        
+                        if (monthIndex !== -1) {
+                            const dueDate = new Date(year, monthIndex, day);
+                            
+                            // Highlight if overdue and not paid
+                            const row = cell.closest('tr');
+                            const statusBadge = row.querySelector('.status-badge');
+                            
+                            if (dueDate < today && statusBadge && !statusBadge.classList.contains('status-paid')) {
+                                if (!statusBadge.classList.contains('status-overdue')) {
+                                    statusBadge.className = 'status-badge status-overdue';
+                                    statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Overdue';
+                                }
+                                
+                                // Update debit status if needed
+                                const debitCard = row.closest('.debit-card');
+                                const debitStatus = debitCard.getAttribute('data-debit-status');
+                                if (debitStatus !== 'overdue') {
+                                    debitCard.setAttribute('data-debit-status', 'overdue');
+                                    const debitHeader = debitCard.querySelector('.debit-header');
+                                    debitHeader.className = 'debit-header overdue';
+                                    
+                                    const debitTitleIcon = debitCard.querySelector('.debit-header-title i');
+                                    debitTitleIcon.className = 'fas fa-exclamation-triangle';
+                                    
+                                    const statusBadge = debitCard.querySelector('.debit-status-badge');
+                                    statusBadge.textContent = 'OVERDUE';
+                                    
+                                    // Re-sort after updating status
+                                    sortDebitCards();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Add expand/collapse functionality for debit cards on mobile
+            if (window.innerWidth <= 768) {
+                const debitHeaders = document.querySelectorAll('.debit-header');
+                debitHeaders.forEach(header => {
+                    header.style.cursor = 'pointer';
+                    header.addEventListener('click', function(e) {
+                        if (e.target.closest('.debit-status-badge') || e.target.closest('i')) {
+                            return;
+                        }
+                        
+                        const card = this.closest('.debit-card');
+                        const tableContainer = card.querySelector('.emi-table-container');
+                        
+                        // Toggle expanded class
+                        card.classList.toggle('expanded');
+                        
+                        // Smooth height transition
+                        if (card.classList.contains('expanded')) {
+                            tableContainer.style.maxHeight = tableContainer.scrollHeight + 'px';
+                            tableContainer.style.overflow = 'visible';
+                        } else {
+                            tableContainer.style.maxHeight = '0';
+                            tableContainer.style.overflow = 'hidden';
+                        }
+                    });
+                });
+                
+                // Add CSS for smooth transitions
+                const style = document.createElement('style');
+                style.textContent = `
+                    .emi-table-container {
+                        max-height: 0;
+                        overflow: hidden;
+                        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                    }
+                    
+                    .debit-card.expanded .emi-table-container {
+                        max-height: 2000px;
+                    }
+                    
+                    .debit-header {
+                        transition: background-color 0.3s ease;
+                    }
+                    
+                    .debit-header:active {
+                        opacity: 0.9;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Add CSS for blink animation for overdue dates
+            const blinkStyle = document.createElement('style');
+            blinkStyle.textContent = `
+                .date-overdue {
+                    animation: blink 1.5s infinite;
+                }
+                
+                @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.7; }
+                }
+            `;
+            document.head.appendChild(blinkStyle);
+        });
+    </script>
 </body>
 </html>

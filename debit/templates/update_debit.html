@@ -2,175 +2,938 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Update Debit</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-.hidden { display:none; }
-#emi-section { background:#f8f9fa; padding:15px; border-radius:8px; margin-top:15px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Debit – GULBEE LEDGER</title>
+    
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= CSS VARIABLES (Matching Dashboard) ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #162447;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-hover: rgba(30, 41, 59, 0.9);
+            
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.1);
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border: #334155;
+            --border-light: rgba(51, 65, 85, 0.3);
+            --shadow: rgba(0, 0, 0, 0.25);
+            --shadow-lg: rgba(0, 0, 0, 0.35);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ================= BASE STYLES ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* ================= TOP NAVIGATION ================= */
+        .topnav {
+            background-color: var(--bg-elevated);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(22, 36, 71, 0.95);
+        }
+        
+        .brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .brand-icon {
+            font-size: 1.8rem;
+        }
+        
+        .menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .menu-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            color: var(--text-main);
+        }
+        
+        .menu-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .logout-link {
+            color: var(--danger);
+            margin-left: 0.5rem;
+        }
+        
+        .logout-link:hover {
+            color: #fca5a5;
+        }
+        
+        /* ================= PAGE CONTENT ================= */
+        .page-content {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+        }
+        
+        /* ================= PAGE HEADER ================= */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .page-title {
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(to right, #ffffff, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+            margin: 0;
+        }
+        
+        /* ================= ACTION HEADER ================= */
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            width: 100%;
+        }
+        
+        .back-btn {
+            background: var(--text-muted);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-btn:hover {
+            background: #64748b;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* ================= FORM CARD ================= */
+        .form-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px var(--shadow-lg);
+            transition: var(--transition);
+        }
+        
+        .form-card:hover {
+            border-color: var(--border);
+            box-shadow: 0 25px 50px var(--shadow);
+            transform: translateY(-5px);
+        }
+        
+        .form-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .form-header i {
+            color: var(--primary);
+        }
+        
+        /* ================= FORM STYLES ================= */
+        .form-control, .form-select, .form-textarea {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .form-control:focus, .form-select:focus, .form-textarea:focus {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            color: var(--text-main);
+            outline: none;
+        }
+        
+        .form-control::placeholder, .form-textarea::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* ================= CHECKBOX STYLES ================= */
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-left: 0;
+        }
+        
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            margin-right: 0.5rem;
+        }
+        
+        .form-check-label {
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        /* ================= EMI SECTION ================= */
+        .emi-section {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .emi-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .emi-title i {
+            color: var(--warning);
+        }
+        
+        /* ================= EXISTING EMIS SECTION ================= */
+        .existing-emis {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.2);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+        }
+        
+        .existing-emis-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .emi-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-light);
+        }
+        
+        .emi-info {
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        
+        .emi-sequence {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .emi-amount {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-paid {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge-pending {
+            background: var(--warning);
+            color: var(--bg-main);
+        }
+        
+        /* ================= BUTTON STYLES ================= */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--text-muted);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #64748b;
+            transform: translateY(-2px);
+        }
+        
+        /* ================= FORM BUTTONS ================= */
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .form-buttons .btn {
+            width: 50%;
+        }
+        
+        /* ================= RESPONSIVE DESIGN ================= */
+        
+        /* Mobile Menu (Hamburger) */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        /* For mobile screens */
+        @media (max-width: 768px) {
+            .topnav {
+                padding: 0.75rem 1rem;
+                flex-direction: row;
+                gap: 1rem;
+            }
+            
+            .brand {
+                font-size: 1.2rem;
+            }
+            
+            .brand-icon {
+                font-size: 1.5rem;
+            }
+            
+            .menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-elevated);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            .menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .menu-link {
+                padding: 0.75rem;
+                border-radius: var(--radius);
+                margin-bottom: 0.25rem;
+            }
+            
+            .menu-link:hover {
+                background: var(--bg-surface);
+            }
+            
+            .menu-link.active::after {
+                display: none;
+            }
+            
+            .menu-link.active {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+            
+            .menu-link span {
+                display: inline;
+            }
+            
+            .page-content {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+                width: 100%;
+            }
+            
+            .action-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            .form-header {
+                font-size: 1.3rem;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+            }
+            
+            .form-buttons .btn {
+                width: 100%;
+            }
+            
+            .emi-section {
+                padding: 1rem;
+            }
+        }
+        
+        /* For very small screens */
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 1rem;
+                gap: 0.5rem;
+            }
+            
+            .brand-icon {
+                font-size: 1.2rem;
+            }
+            
+            .page-title {
+                font-size: 1.3rem;
+            }
+            
+            .form-card {
+                padding: 1.25rem;
+            }
+            
+            .emi-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+        
+        /* ================= ANIMATIONS ================= */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
 </head>
+
 <body>
-
-<div class="container mt-4">
-    <div class="col-md-8 mx-auto">
-        {% if popup_message %}
-        <script>
-            alert("{{ popup_message }}");
-        </script>
-        {% endif %}
-
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4>Update Debit</h4>
-            </div>
-
-            <div class="card-body">
-                <form method="POST">
-                    {% csrf_token %}
-
-                    <!-- Basic Fields -->
-                    <div class="mb-3">
-                        <label>Lender Name</label>
-                        <input type="text" class="form-control" name="lender_name" value="{{ debit.lender_name }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Principal Amount</label>
-                        <input type="number" step="0.01" class="form-control" name="principal_amount" value="{{ debit.amount }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>Start Date</label>
-                        <input type="date"
-                        class="form-control"
-                        name="start_date"
-                        value="{{ debit.start_date|date:'Y-m-d' }}"
-                        required>
-                                     </div>
-
-                    <div class="mb-3">
-                        <label>Notes</label>
-                        <textarea class="form-control" name="notes" rows="3">{{ debit.notes }}</textarea>
-                    </div>
-
-                    <!-- EMI Checkbox -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="id_is_emi" name="is_emi" {% if debit.is_emi %}checked{% endif %}>
-                        <label class="form-check-label" for="id_is_emi">Is EMI?</label>
-                    </div>
-
-                    <!-- EMI Section -->
-                    <div id="emi-section" class="hidden">
-                        <h5 class="text-primary fw-bold">EMI Details</h5>
-
-                      <!-- EMI Type -->
-<div class="mb-3">
-    <label>EMI Type</label>
-    <select class="form-select" id="emi_type" name="emi_type">
-        <option value="">Select EMI Type</option>
-        {% for val,label in emi_types %}
-            {% if val != "NO" %}
-            <option value="{{ val }}" {% if debit.emi_type == val %}selected{% endif %}>{{ label }}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
-</div>
-
-<!-- Installment Frequency -->
-<div class="mb-3">
-    <label>Installment Frequency</label>
-    <select class="form-select" name="installment_frequency">
-        <option value="">Select Frequency</option>
-        {% for val,label in installment_types %}
-            <option value="{{ val }}" {% if debit.installment_type == val %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
-</div>
-
-
-                        <!-- Number of Installments -->
-                        <div class="mb-3">
-                            <label>Number of Installments</label>
-                            <input type="number" class="form-control" name="installments" value="{{ debit.emi_period }}">
-                        </div>
-
-                        <!-- Interest Rate -->
-                        <div id="interest-field" class="mb-3">
-                            <label>EMI Interest Rate (%)</label>
-                            <input type="number" step="0.01" class="form-control" name="emi_interest_rate" value="{{ debit.interest_percent }}">
-                        </div>
-
-                        <!-- Custom EMI -->
-                        <div id="custom-emi-field" class="mb-3 hidden">
-                            <label>Custom EMI Amount</label>
-                            <input type="number" step="0.01" class="form-control" name="emi_amt" value="{{ debit.emi_amount }}">
-                        </div>
-
-                        <!-- Display existing EMI info if partially paid -->
-                        {% if existing_emis %}
-                        <div class="mt-3">
-                            <h6>Existing EMIs:</h6>
-                            <ul class="list-group">
-                                {% for emi in existing_emis %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Seq {{ emi.sequence_number }}: Amount {{ emi.amount }}
-                                    {% if emi.status == "PAID" %}
-                                    <span class="badge bg-success">Paid on {{ emi.paid_date }}</span>
-                                    {% else %}
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                    {% endif %}
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="d-flex gap-2 mt-3">
-                        <a href="{% url 'view_all' %}" class="btn btn-secondary w-50">
-                            ← Back to All Debits
-                        </a>
-                        <button type="submit" class="btn btn-success w-50">
-                            Update
-                        </button>
-                    </div>
-                                    </form>
-            </div>
+    <!-- TOP NAVIGATION -->
+    <div class="topnav">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <i class="fas fa-chart-pie brand-icon"></i>
+            GULBEE LEDGER
+        </div>
+        <div class="menu" id="mainMenu">
+            <a href="{% url 'home' %}" class="menu-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'view_all_income' %}" class="menu-link">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Income</span>
+            </a>
+            <a href="{% url 'view_all_expense' %}" class="menu-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Expense</span>
+            </a>
+            <a href="{% url 'view_all_emi' %}" class="menu-link">
+                <i class="fas fa-credit-card"></i>
+                <span>EMI</span>
+            </a>
+            <a href="{% url 'view_all' %}" class="menu-link active">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Debit</span>
+            </a>
+            <a href="{% url 'report_home' %}" class="menu-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{% url 'login' %}" class="menu-link logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
         </div>
     </div>
-</div>
 
-<script>
-const isEmi = document.getElementById("id_is_emi");
-const emiSection = document.getElementById("emi-section");
-const emiType = document.getElementById("emi_type");
-const interestField = document.getElementById("interest-field");
-const customField = document.getElementById("custom-emi-field");
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Update Debit</h1>
+        </div>
+        
+        <!-- Action Header -->
+        <div class="action-header">
+            <a href="{% url 'view_all' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Debits
+            </a>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="form-card">
+            <div class="form-header">
+                <i class="fas fa-edit"></i>
+                Edit Debit Details
+            </div>
+            
+            <!-- Display popup message if exists -->
+            {% if popup_message %}
+            <div class="alert alert-success" role="alert" style="background: var(--success-light); color: #a7f3d0; border-left: 4px solid var(--success);">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ popup_message }}
+            </div>
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Lender Name -->
+                <div class="form-group">
+                    <label class="form-label">Lender Name</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="lender_name" 
+                           value="{{ debit.lender_name }}" 
+                           required>
+                </div>
+                
+                <!-- Principal Amount -->
+                <div class="form-group">
+                    <label class="form-label">Principal Amount</label>
+                    <input type="number" 
+                           step="0.01"
+                           class="form-control" 
+                           name="principal_amount" 
+                           value="{{ debit.amount }}" 
+                           required>
+                </div>
+                
+                <!-- Start Date -->
+                <div class="form-group">
+                    <label class="form-label">Start Date</label>
+                    <input type="date"
+                           class="form-control"
+                           name="start_date"
+                           value="{{ debit.start_date|date:'Y-m-d' }}"
+                           required>
+                </div>
+                
+                <!-- Notes -->
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" 
+                              name="notes" 
+                              rows="3">{{ debit.notes }}</textarea>
+                </div>
+                
+                <!-- Is EMI Checkbox -->
+                <div class="form-check">
+                    <input type="checkbox" 
+                           class="form-check-input" 
+                           id="id_is_emi" 
+                           name="is_emi" 
+                           {% if debit.is_emi %}checked{% endif %}>
+                    <label class="form-check-label" for="id_is_emi">
+                        This is an EMI (Installment) Loan
+                    </label>
+                </div>
+                
+                <!-- EMI SECTION -->
+                <div id="emi-section" class="emi-section {% if not debit.is_emi %}hidden{% endif %}">
+                    <div class="emi-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        EMI Details
+                    </div>
+                    
+                    <!-- EMI Type -->
+                    <div class="form-group">
+                        <label class="form-label">EMI Type</label>
+                        <select class="form-select" 
+                                id="emi_type" 
+                                name="emi_type">
+                            <option value="">Select EMI Type</option>
+                            {% for val,label in emi_types %}
+                                {% if val != "NO" %}
+                                <option value="{{ val }}" 
+                                        {% if debit.emi_type == val %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Installment Frequency -->
+                    <div class="form-group">
+                        <label class="form-label">Installment Frequency</label>
+                        <select class="form-select" 
+                                name="installment_frequency">
+                            <option value="">Select Frequency</option>
+                            {% for val,label in installment_types %}
+                                <option value="{{ val }}" 
+                                        {% if debit.installment_type == val %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Number of Installments -->
+                    <div class="form-group">
+                        <label class="form-label">Number of Installments</label>
+                        <input type="number" 
+                               class="form-control" 
+                               name="installments" 
+                               value="{{ debit.emi_period }}">
+                    </div>
+                    
+                    <!-- Interest Rate -->
+                    <div id="interest-field" class="form-group {% if debit.emi_type == 'CUSTOM' %}hidden{% endif %}">
+                        <label class="form-label">EMI Interest Rate (%)</label>
+                        <input type="number" 
+                               step="0.01"
+                               class="form-control" 
+                               name="emi_interest_rate" 
+                               value="{{ debit.interest_percent }}">
+                    </div>
+                    
+                    <!-- Custom EMI -->
+                    <div id="custom-emi-field" class="form-group {% if debit.emi_type != 'CUSTOM' %}hidden{% endif %}">
+                        <label class="form-label">Custom EMI Amount</label>
+                        <input type="number" 
+                               step="0.01"
+                               class="form-control" 
+                               name="emi_amt" 
+                               value="{{ debit.emi_amount }}">
+                    </div>
+                    
+                    <!-- Display existing EMIs if partially paid -->
+                    {% if existing_emis %}
+                    <div class="existing-emis">
+                        <div class="existing-emis-title">
+                            <i class="fas fa-history"></i>
+                            Existing EMIs
+                        </div>
+                        {% for emi in existing_emis %}
+                        <div class="emi-item">
+                            <div class="emi-info">
+                                <span class="emi-sequence">Sequence {{ emi.sequence_number }}</span>: 
+                                <span class="emi-amount">₹{{ emi.amount }}</span>
+                            </div>
+                            {% if emi.status == "PAID" %}
+                            <span class="badge badge-paid">
+                                Paid on {{ emi.paid_date|date:"Y-m-d" }}
+                            </span>
+                            {% else %}
+                            <span class="badge badge-pending">
+                                Pending
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Form Buttons -->
+                <div class="form-buttons">
+                    <a href="{% url 'view_all' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save me-2"></i>
+                        Update Debit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-function toggleEmi() {
-    emiSection.classList.toggle("hidden", !isEmi.checked);
-}
-
-function toggleType() {
-    if (emiType.value === "CUSTOM") {
-        interestField.classList.add("hidden");
-        customField.classList.remove("hidden");
-    } else {
-        interestField.classList.remove("hidden");
-        customField.classList.add("hidden");
-    }
-}
-
-isEmi.addEventListener("change", toggleEmi);
-emiType.addEventListener("change", toggleType);
-
-// Initialize on page load
-toggleEmi();
-toggleType();
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mainMenu = document.getElementById('mainMenu');
+            
+            // Toggle mobile menu
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mainMenu.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (mainMenu.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            }
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (mainMenu && !mainMenu.contains(event.target) && mobileMenuToggle && !mobileMenuToggle.contains(event.target)) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                }
+            });
+            
+            // Close menu when clicking a link
+            const menuLinks = document.querySelectorAll('.menu-link');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768 && mainMenu) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                }
+            });
+        });
+        
+        // EMI toggle functionality
+        const isEmi = document.getElementById("id_is_emi");
+        const emiSection = document.getElementById("emi-section");
+        const emiType = document.getElementById("emi_type");
+        const interestField = document.getElementById("interest-field");
+        const customField = document.getElementById("custom-emi-field");
+        
+        function toggleEmi() {
+            emiSection.classList.toggle("hidden", !isEmi.checked);
+        }
+        
+        function toggleType() {
+            if (emiType.value === "CUSTOM") {
+                interestField.classList.add("hidden");
+                customField.classList.remove("hidden");
+            } else {
+                interestField.classList.remove("hidden");
+                customField.classList.add("hidden");
+            }
+        }
+        
+        isEmi.addEventListener("change", toggleEmi);
+        emiType.addEventListener("change", toggleType);
+        
+        // Initialize based on current state
+        toggleEmi();
+        toggleType();
+    </script>
 </body>
 </html>

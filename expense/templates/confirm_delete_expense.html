@@ -2,88 +2,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Confirm Delete Expense</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-    body {
-        background: linear-gradient(135deg, #f0f3f8, #ffffff);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .delete-card {
-        background: #fff;
-        padding: 30px 25px;
-        border-radius: 18px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        max-width: 500px;
-        width: 100%;
-        text-align: center;
-    }
-
-    .delete-card h4 {
-        color: #dc3545;
-        font-weight: 700;
-        margin-bottom: 20px;
-    }
-
-    .delete-card p {
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
-
-    .btn-danger, .btn-secondary {
-        padding: 10px 25px;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-
-    .btn-danger:hover {
-        background-color: #bd2130;
-        border-color: #bd2130;
-    }
-
-    .btn-secondary:hover {
-        background-color: #6c757d;
-        border-color: #6c757d;
-    }
-
-    @media (max-width: 576px) {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Delete – Expense Manager</title>
+    
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= CSS VARIABLES ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #162447;
+            --bg-card: rgba(30, 41, 59, 0.9);
+            --bg-hover: rgba(30, 41, 59, 0.95);
+            
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.15);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.15);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border: #334155;
+            --border-light: rgba(51, 65, 85, 0.3);
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-lg: rgba(0, 0, 0, 0.5);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ================= BASE STYLES ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        /* ================= DELETE CARD ================= */
         .delete-card {
-            padding: 20px 15px;
-        }
-
-        .delete-card p {
-            font-size: 14px;
-        }
-
-        .btn-danger, .btn-secondary {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px var(--shadow);
+            max-width: 500px;
             width: 100%;
-            margin-bottom: 10px;
+            text-align: center;
+            transition: var(--transition);
+            border-left: 4px solid var(--danger);
         }
-    }
-</style>
+        
+        .delete-card:hover {
+            box-shadow: 0 25px 50px var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+        
+        /* ================= CARD HEADER ================= */
+        .delete-icon {
+            font-size: 3.5rem;
+            color: var(--danger);
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .delete-title {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ef4444, #f87171);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+        
+        /* ================= EXPENSE DETAILS ================= */
+        .expense-details {
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .expense-id {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .expense-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+        
+        .expense-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        
+        .info-value.amount {
+            color: var(--danger);
+            font-size: 1.1rem;
+        }
+        
+        /* ================= WARNING MESSAGE ================= */
+        .warning-message {
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: var(--radius);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--warning);
+            text-align: left;
+        }
+        
+        .warning-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--warning);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .warning-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        /* ================= BUTTONS ================= */
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 0.85rem 1.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 160px;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-cancel {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-cancel:hover {
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+        
+        /* ================= RESPONSIVE STYLES ================= */
+        
+        /* Small screens (phones) */
+        @media (max-width: 576px) {
+            body {
+                padding: 15px;
+            }
+            
+            .delete-card {
+                padding: 1.5rem;
+            }
+            
+            .delete-icon {
+                font-size: 3rem;
+                margin-bottom: 1.25rem;
+            }
+            
+            .delete-title {
+                font-size: 1.5rem;
+            }
+            
+            .expense-details {
+                padding: 1rem;
+                margin: 1.25rem 0;
+            }
+            
+            .expense-title {
+                font-size: 1.1rem;
+            }
+            
+            .expense-info {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .info-item {
+                min-width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .info-item:last-child {
+                border-bottom: none;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .btn {
+                min-width: 100%;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+        
+        /* Medium screens (tablets) */
+        @media (min-width: 577px) and (max-width: 768px) {
+            .delete-card {
+                padding: 2rem;
+                max-width: 450px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: 100%;
+            }
+        }
+        
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .delete-card {
+                padding: 1.25rem;
+            }
+            
+            .delete-icon {
+                font-size: 2.5rem;
+            }
+            
+            .delete-title {
+                font-size: 1.3rem;
+            }
+            
+            .expense-title {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 0.65rem 1.25rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 10px;
+            }
+            
+            .delete-card {
+                padding: 1.5rem;
+                max-width: 90%;
+            }
+            
+            .delete-icon {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .expense-details {
+                margin: 1rem 0;
+                padding: 0.75rem;
+            }
+            
+            .btn-group {
+                margin-top: 1.5rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-
-<div class="delete-card">
-    <h4>⚠️ Confirm Delete</h4>
-    <p>Are you sure you want to delete <strong>{{ exp.expense_id }} - {{ exp.title }}</strong>?</p>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="d-flex justify-content-center flex-wrap gap-2">
-            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-1"></i> Yes, Delete</button>
-            <a href="{% url 'view_all_expense' %}" class="btn btn-secondary"><i class="fas fa-times me-1"></i> Cancel</a>
+    <div class="delete-card">
+        <!-- Warning Icon -->
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-triangle"></i>
         </div>
-    </form>
-</div>
+        
+        <!-- Title -->
+        <h1 class="delete-title">
+            Confirm Delete
+        </h1>
+        
+        <!-- Expense Details -->
+        <div class="expense-details">
+            <div class="expense-id">
+                ID: {{ exp.expense_id }}
+            </div>
+            <div class="expense-title">
+                {{ exp.title }}
+            </div>
+            
+            <!-- Additional Info -->
+            <div class="expense-info">
+                <div class="info-item">
+                    <span class="info-label">Amount</span>
+                    <span class="info-value amount">
+                        ₹{{ exp.amount }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Category</span>
+                    <span class="info-value">
+                        {{ exp.get_category_display }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date</span>
+                    <span class="info-value">
+                        {{ exp.date|date:"d M Y" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Warning Message -->
+        <div class="warning-message">
+            <div class="warning-title">
+                <i class="fas fa-exclamation-circle"></i>
+                Warning: This action cannot be undone
+            </div>
+            <p class="warning-text">
+                You are about to permanently delete this expense record. This will remove all associated data including any uploaded bill photos. Please confirm your decision.
+            </p>
+        </div>
+        
+        <!-- Form with Buttons -->
+        <form method="POST">
+            {% csrf_token %}
+            <div class="btn-group">
+                <button type="submit" class="btn btn-delete">
+                    <i class="fas fa-trash-alt"></i>
+                    Yes, Delete Permanently
+                </button>
+                <a href="{% url 'view_all_expense' %}" class="btn btn-cancel">
+                    <i class="fas fa-times"></i>
+                    Cancel & Go Back
+                </a>
+            </div>
+        </form>
+    </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation to card
+            const deleteCard = document.querySelector('.delete-card');
+            if (deleteCard) {
+                deleteCard.style.opacity = '0';
+                deleteCard.style.transform = 'translateY(20px) scale(0.95)';
+                
+                setTimeout(() => {
+                    deleteCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    deleteCard.style.opacity = '1';
+                    deleteCard.style.transform = 'translateY(0) scale(1)';
+                }, 100);
+            }
+            
+            // Add confirmation before submit
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const deleteBtn = this.querySelector('.btn-delete');
+                    if (deleteBtn) {
+                        deleteBtn.disabled = true;
+                        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    }
+                });
+            }
+            
+            // Prevent accidental back button usage
+            window.addEventListener('beforeunload', function(e) {
+                const form = document.querySelector('form');
+                if (form) {
+                    const deleteBtn = form.querySelector('.btn-delete');
+                    if (deleteBtn && !deleteBtn.disabled) {
+                        e.preventDefault();
+                        e.returnValue = '';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

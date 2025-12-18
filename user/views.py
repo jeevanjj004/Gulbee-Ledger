@@ -10,7 +10,11 @@ from debit.models import Debit
 from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
-
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -112,3 +116,80 @@ def home(request):
     }
 
     return render(request, "home.html", context)
+
+
+# ===============================
+# Change Password (Logged-in user)
+# ===============================
+@login_required
+def change_password(request):
+    context = {}
+
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        user = request.user
+
+        if not user.check_password(current_password):
+            context["error"] = "Current password is incorrect"
+            return render(request, "change_password.html", context)
+
+        if new_password != confirm_password:
+            context["error"] = "New password and confirm password do not match"
+            return render(request, "change_password.html", context)
+
+        user.set_password(new_password)
+        user.save()
+
+        context["success"] = "Password changed successfully. Please login again."
+        return render(request, "change_password.html", context)
+
+    return render(request, "change_password.html", context)
+
+
+# # ===============================
+# # Forget Password (Email reset)
+# # ===============================
+# def forget_password(request):
+#     context = {}
+
+#     if request.method == "POST":
+#         email = request.POST.get("email")
+
+#         try:
+#             user = User.objects.get(email=email)
+#         except User.DoesNotExist:
+#             context["error"] = "No account found with this email"
+#             return render(request, "forget_password.html", context)
+
+#         # Generate random password
+#         random_password = get_random_string(length=8)
+#         user.set_password(random_password)
+#         user.save()
+
+#         send_mail(
+#             subject="Gulbee Ledger - Password Reset",
+#             message=f"""
+# Hello {user.username},
+
+# Your new temporary password is:
+
+# {random_password}
+
+# Please login and change your password immediately.
+# """,
+#             from_email="internshipidk456@gmail.com",
+#             recipient_list=[email],
+#             fail_silently=False,
+#         )
+
+#         context["success"] = "New password sent to your email"
+#         return render(request, "forget_password.html", context)
+
+#     return render(request, "forget_password.html", context)
+
+
+def profile(request):
+    return render(request,"profile.html")

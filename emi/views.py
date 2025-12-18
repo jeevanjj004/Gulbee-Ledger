@@ -13,8 +13,7 @@ from django.http import HttpResponse
 def view_emi(request):
     user = request.user
     emis = EMI.objects.filter(user=user).order_by("debit", "sequence_number")
-    print(emis)
-    print(user)
+
     return render(request, "view_all_emi.html", {"emis": emis})
 
 def pay_emi(request, emi_id):

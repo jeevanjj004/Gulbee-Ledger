@@ -4,167 +4,718 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Update Expense – Expense Manager</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<style>
-:root {
-    --primary-color: #0d6efd;
-    --dark-color: #212529;
-    --red-color: #dc3545;
-}
-
-body {
-    background: linear-gradient(135deg, #f0f3f8, #ffffff);
-    min-height: 100vh;
-    padding: 20px 0;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-.expense-card {
-    max-width: 700px;
-    margin: auto;
-    padding: 35px 40px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.header-title {
-    font-size: 28px;
-    font-weight: 800;
-    text-align: center;
-    color: var(--red-color);
-    margin-bottom: 25px;
-}
-
-label { font-weight: 600; }
-
-.form-control, .form-select {
-    padding: 12px;
-    border-radius: 10px;
-    transition: all 0.2s;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: var(--red-color);
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
-
-.btn-submit {
-    padding: 12px;
-    border-radius: 10px;
-    font-size: 17px;
-    font-weight: 600;
-    background-color: var(--red-color);
-    border-color: var(--red-color);
-    transition: background-color 0.3s;
-}
-.btn-submit:hover {
-    background-color: #bd2130;
-    border-color: #bd2130;
-}
-
-.current-bill {
-    margin-top: 5px;
-    display: block;
-    font-size: 14px;
-    color: #555;
-}
-
-/* Mobile */
-@media (max-width: 576px) {
-    .expense-card { padding: 25px 20px; }
-    .header-title { font-size: 24px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Expense – Expense Manager</title>
+    
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= CSS VARIABLES ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #162447;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-hover: rgba(30, 41, 59, 0.9);
+            
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.1);
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border: #334155;
+            --border-light: rgba(51, 65, 85, 0.3);
+            --shadow: rgba(0, 0, 0, 0.25);
+            --shadow-lg: rgba(0, 0, 0, 0.35);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ================= BASE STYLES ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 2rem;
+        }
+        
+        /* ================= TOP NAVIGATION ================= */
+        .topnav {
+            background-color: var(--bg-elevated);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(22, 36, 71, 0.95);
+        }
+        
+        .brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .brand-icon {
+            font-size: 1.8rem;
+        }
+        
+        .menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .menu-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            color: var(--text-main);
+        }
+        
+        .menu-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .logout-link {
+            color: var(--danger);
+            margin-left: 0.5rem;
+        }
+        
+        .logout-link:hover {
+            color: #fca5a5;
+        }
+        
+        /* ================= PAGE CONTENT ================= */
+        .page-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #ffffff, #ef4444);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .page-subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        /* ================= FORM CARD ================= */
+        .form-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px var(--shadow-lg);
+        }
+        
+        .form-card:hover {
+            border-color: var(--border);
+            box-shadow: 0 12px 48px var(--shadow-lg);
+        }
+        
+        /* ================= FORM STYLES ================= */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: var(--radius);
+            padding: 0.875rem 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-surface);
+            border-color: var(--danger);
+            color: var(--text-main);
+            box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* ================= FILE INPUT STYLES ================= */
+        .file-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .file-input-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .file-preview {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .current-bill-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+        
+        .bill-preview {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-surface);
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+        
+        .bill-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+        }
+        
+        .bill-info {
+            flex: 1;
+        }
+        
+        .bill-name {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            word-break: break-all;
+        }
+        
+        .view-bill-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: var(--transition);
+        }
+        
+        .view-bill-link:hover {
+            color: var(--text-light);
+            gap: 0.5rem;
+        }
+        
+        /* ================= BUTTON STYLES ================= */
+        .btn-submit {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            margin-top: 2rem;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+        
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-back:hover {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border-color: var(--border-light);
+            transform: translateY(-1px);
+        }
+        
+        /* ================= ALERTS ================= */
+        .alert-container {
+            max-width: 800px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+        
+        .alert {
+            background: var(--danger-light);
+            border: 1px solid var(--danger);
+            color: var(--text-main);
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        /* ================= RESPONSIVE STYLES ================= */
+        @media (max-width: 768px) {
+            .topnav {
+                padding: 0.75rem 1rem;
+            }
+            
+            .brand {
+                font-size: 1.2rem;
+            }
+            
+            .page-content {
+                margin: 1.5rem auto;
+                padding: 0 0.75rem;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .bill-preview {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .bill-info {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-content {
+                margin: 1rem auto;
+            }
+            
+            .form-card {
+                padding: 1.25rem;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .form-control, .form-select {
+                padding: 0.75rem;
+            }
+            
+            .btn-submit {
+                padding: 0.875rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .file-input-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .file-preview {
+                min-width: unset;
+            }
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-elevated);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            .menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .menu-link {
+                padding: 0.75rem;
+                border-radius: var(--radius);
+                margin-bottom: 0.25rem;
+            }
+            
+            .menu-link:hover, .menu-link.active {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+            
+            .menu-link.active::after {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <div class="expense-card">
-        <h3 class="header-title"><i class="fas fa-hand-holding-usd me-2"></i> Update Expense</h3>
-
-        {% if messages %}
-            {% for m in messages %}
-                <div class="alert alert-danger py-2 text-center" role="alert">{{ m }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST" enctype="multipart/form-data" id="updateExpenseForm">
-            {% csrf_token %}
-
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="id_title" class="form-label">Title <span class="text-danger">*</span></label>
-                        {{ form.title|add_class:"form-control" }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_category" class="form-label">Category <span class="text-danger">*</span></label>
-                        {{ form.category|add_class:"form-select" }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_paid_to" class="form-label">Paid To <span class="text-danger">*</span></label>
-                        {{ form.paid_to|add_class:"form-control" }}
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="id_amount" class="form-label">Amount (₹) <span class="text-danger">*</span></label>
-                        {{ form.amount|add_class:"form-control" }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_date" class="form-label">Date <span class="text-danger">*</span></label>
-                        {{ form.date|add_class:"form-control" }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="id_bill_photo" class="form-label">Bill Photo (Optional)</label>
-                        
-                        <div class="d-flex align-items-center gap-3">
-                            <!-- File input -->
-                            <input type="file" id="id_bill_photo" name="bill_photo" class="form-control" style="max-width: 200px;">
-                            
-                            <!-- Preview of current bill -->
-                            {% if exp.bill_photo %}
-                            <div class="current-bill-preview" style="text-align:center;">
-                                <span class="text-muted small">Current Bill:</span>
-                                <a href="{{ exp.bill_photo.url }}" target="_blank">
-                                    <img src="{{ exp.bill_photo.url }}" alt="Bill Photo" style="height:60px; width:auto; border-radius:8px; border:1px solid #ddd; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
-                                </a>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label for="id_notes" class="form-label">Notes (Optional)</label>
-                {{ form.notes|add_class:"form-control" }}
-            </div>
-
-            <button type="submit" class="btn btn-danger w-100 btn-submit">
-                <i class="fas fa-save me-2"></i> Update Expense
-            </button>
-        </form>
-
-        <div class="text-center mt-3 pt-2 border-top">
-            <a href="{% url 'view_all_expense' %}" class="fw-semibold text-decoration-none text-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Back to Expense List
+    <!-- TOP NAVIGATION -->
+    <div class="topnav">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <i class="fas fa-chart-pie brand-icon"></i>
+            GULBEE LEDGER
+        </div>
+        <div class="menu" id="mainMenu">
+            <a href="{% url 'home' %}" class="menu-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'view_all_income' %}" class="menu-link">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Income</span>
+            </a>
+            <a href="{% url 'view_all_expense' %}" class="menu-link active">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Expense</span>
+            </a>
+            <a href="{% url 'view_all_emi' %}" class="menu-link">
+                <i class="fas fa-credit-card"></i>
+                <span>EMI</span>
+            </a>
+            <a href="{% url 'view_all' %}" class="menu-link">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Debit</span>
+            </a>
+            <a href="{% url 'report_home' %}" class="menu-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{% url 'login' %}" class="menu-link logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
             </a>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ALERTS -->
+    {% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- MAIN CONTENT -->
+    <div class="page-content">
+        <div class="page-header">
+            <h1 class="page-title">Update Expense</h1>
+            <p class="page-subtitle">Modify your expense details below</p>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" enctype="multipart/form-data" id="updateExpenseForm">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <!-- Left Column -->
+                    <div class="col-lg-6">
+                        <!-- Title Field -->
+                        <div class="mb-4">
+                            <label for="id_title" class="form-label required-field">
+                                <i class=""></i>Title
+                            </label>
+                            {{ form.title|add_class:"form-control"|attr:"placeholder:Enter expense title" }}
+                        </div>
+
+                        <!-- Category Field -->
+                        <div class="mb-4">
+                            <label for="id_category" class="form-label required-field">
+                                <i class=""></i>Category
+                            </label>
+                            {{ form.category|add_class:"form-select" }}
+                        </div>
+
+                        <!-- Paid To Field -->
+                        <div class="mb-4">
+                            <label for="id_paid_to" class="form-label required-field">
+                                <i class=""></i>Paid To
+                            </label>
+                            {{ form.paid_to|add_class:"form-control"|attr:"placeholder:Enter recipient name" }}
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-lg-6">
+                        <!-- Amount Field -->
+                        <div class="mb-4">
+                            <label for="id_amount" class="form-label required-field">
+                                <i class=""></i>Amount (₹)
+                            </label>
+                            {{ form.amount|add_class:"form-control"|attr:"placeholder:Enter amount" }}
+                        </div>
+
+                        <!-- Date Field -->
+                        <div class="mb-4">
+                            <label for="id_date" class="form-label required-field">
+                                <i class=""></i>Date
+                            </label>
+                            {{ form.date|add_class:"form-control"|attr:"type:date" }}
+                        </div>
+
+                        <!-- Bill Photo Field -->
+                        <div class="mb-4">
+                            <label for="id_bill_photo" class="form-label">
+                                <i class=""></i>Change Bill Photo
+                            </label>
+                            <div class="file-input-wrapper">
+                                <!-- File Input -->
+                                <input type="file" id="id_bill_photo" name="bill_photo" 
+                                       class="form-control" accept="image/*">
+                                
+                                <!-- Current Bill Preview -->
+                                {% if exp.bill_photo %}
+                                <div class="file-preview">
+                                    <div class="current-bill-label">Current Bill:</div>
+                                    <div class="bill-preview">
+                                        <img src="{{ exp.bill_photo.url }}" 
+                                             alt="Current Bill" 
+                                             class="bill-image">
+                                        <div class="bill-info">
+                                            <div class="bill-name">
+                                                {{ exp.bill_photo.name|slice:"20:"|truncatechars:30 }}
+                                            </div>
+                                            <a href="{{ exp.bill_photo.url }}" 
+                                               target="_blank" 
+                                               class="view-bill-link">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                View Bill
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Field -->
+                <div class="mb-4">
+                    <label for="id_notes" class="form-label">
+                        <i class=""></i>Notes
+                    </label>
+                    {{ form.notes|add_class:"form-control"|attr:"rows:3"|attr:"placeholder:Add any additional notes..." }}
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-save"></i>
+                    Update Expense
+                </button>
+
+                <!-- Back Button -->
+                <div class="text-center">
+                    <a href="{% url 'view_all_expense' %}" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Expense List
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mainMenu = document.getElementById('mainMenu');
+            
+            mobileMenuToggle.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Form validation
+            const form = document.getElementById('updateExpenseForm');
+            form.addEventListener('submit', function(e) {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.style.borderColor = 'var(--danger)';
+                    } else {
+                        field.style.borderColor = '';
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields marked with *');
+                }
+            });
+            
+            // File input preview
+            const fileInput = document.getElementById('id_bill_photo');
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // You can add file preview logic here if needed
+                        console.log('Selected file:', file.name);
+                    }
+                });
+            }
+            
+            // Add animation to form card
+            const formCard = document.querySelector('.form-card');
+            formCard.style.opacity = '0';
+            formCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                formCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                formCard.style.opacity = '1';
+                formCard.style.transform = 'translateY(0)';
+            }, 300);
+        });
+    </script>
 </body>
 </html>

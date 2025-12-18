@@ -2,152 +2,1132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Income Records – Finance Manager</title>
-
-<!-- Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-<style>
-:root {
-    --primary-color: #4c6ef5;
-    --success-color: #198754;
-    --danger-color: #dc3545;
-    --bg-light: #f5f8ff;
-}
-
-body {
-    background-color: var(--bg-light);
-    font-family: 'Poppins', sans-serif;
-    padding: 20px 10px;
-}
-
-.table-card {
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-}
-
-th {
-    background-color: var(--primary-color);
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-
-.category-badge {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.GIFT { background: #e91e63; color: white; }
-.SALARY { background: #2196f3; color: white; }
-.OTHERS { background: #9c27b0; color: white; }
-
-.total-income {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
-.table-hover tbody tr:hover {
-    background-color: #e7f1ff;
-}
-
-.btn {
-    border-radius: 8px;
-}
-
-.search-card {
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-
-@media (max-width: 576px) {
-    .d-flex.justify-content-between {
-        flex-direction: column;
-        gap: 10px;
-    }
-    .table-responsive { overflow-x: auto; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Records – Finance Manager</title>
+    
+    <!-- Bootstrap & Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= CSS VARIABLES ================= */
+        :root {
+            --bg-main: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-elevated: #162447;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-hover: rgba(30, 41, 59, 0.9);
+            
+            --primary: #3b82f6;
+            --primary-light: rgba(59, 130, 246, 0.1);
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-light: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-light: rgba(245, 158, 11, 0.1);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-light: #cbd5e1;
+            
+            --border: #334155;
+            --border-light: rgba(51, 65, 85, 0.3);
+            --shadow: rgba(0, 0, 0, 0.25);
+            --shadow-lg: rgba(0, 0, 0, 0.35);
+            
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ================= BASE STYLES ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 2rem;
+        }
+        
+        /* ================= TOP NAVIGATION ================= */
+        .topnav {
+            background-color: var(--bg-elevated);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background-color: rgba(22, 36, 71, 0.95);
+        }
+        
+        .brand {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .brand-icon {
+            font-size: 1.8rem;
+        }
+        
+        .menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        
+        .menu-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-link:hover, .menu-link.active {
+            color: var(--text-main);
+        }
+        
+        .menu-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .logout-link {
+            color: var(--danger);
+            margin-left: 0.5rem;
+        }
+        
+        .logout-link:hover {
+            color: #fca5a5;
+        }
+        
+        /* ================= PAGE CONTENT ================= */
+        .page-content {
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #ffffff, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-welcome {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        /* ================= STATS & ACTIONS ================= */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .total-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+        
+        .total-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--success);
+            box-shadow: 0 12px 40px var(--shadow-lg);
+        }
+        
+        .total-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .total-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--success);
+            line-height: 1;
+        }
+        
+        /* ================= TABLE CARD ================= */
+        .table-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+        
+        /* ================= TABLE STYLES ================= */
+        .custom-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .custom-table thead {
+            background: linear-gradient(135deg, #162447 0%, #1e293b 100%);
+        }
+        
+        .custom-table th {
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+        
+        .custom-table tbody tr {
+            border-bottom: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        
+        .custom-table tbody tr:hover {
+            background: var(--bg-hover);
+        }
+        
+        .custom-table td {
+            padding: 1.25rem 1.5rem;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        /* ================= CATEGORY BADGES ================= */
+        .category-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        
+        .SALARY { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .GIFT { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .OTHERS { 
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .FREELANCE { 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+        
+        .INVESTMENT { 
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+        }
+        
+        /* ================= AMOUNT STYLES ================= */
+        .income-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--success);
+        }
+        
+        /* ================= ACTION BUTTONS ================= */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .btn-edit {
+            background: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+        
+        .btn-delete {
+            background: var(--danger-light);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        .btn-edit:hover {
+            background: var(--warning);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-delete:hover {
+            background: var(--danger);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* ================= FILTER CARD (Updated to match debit page) ================= */
+        .filter-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 16px var(--shadow);
+        }
+        
+        .filter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-title i {
+            color: var(--primary);
+        }
+        
+        /* ================= FORM CONTROLS ================= */
+        .form-control, .form-select {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: var(--radius);
+            padding: 0.625rem 1rem;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            color: var(--text-main);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* ================= BUTTON STYLES ================= */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--text-muted);
+            color: white;
+        }
+        
+        /* ================= MAIN BUTTONS ================= */
+        .btn-primary-custom {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-custom {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.875rem 1.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .btn-secondary-custom:hover {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border-color: var(--border-light);
+            transform: translateY(-2px);
+        }
+        
+        /* ================= EMPTY STATE ================= */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state h4 {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        /* ================= HEADER ACTIONS ================= */
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* ================= PAGINATION ================= */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .page-link {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .page-link:hover, .page-link.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* ================= ACTIVE FILTERS ================= */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .active-filter-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .remove-filter {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* ================= RESPONSIVE STYLES ================= */
+        @media (max-width: 768px) {
+            .topnav {
+                padding: 0.75rem 1rem;
+            }
+            
+            .brand {
+                font-size: 1.2rem;
+            }
+            
+            .page-content {
+                margin: 1.5rem auto;
+                padding: 0 0.75rem;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .total-amount {
+                font-size: 2rem;
+            }
+            
+            .custom-table th,
+            .custom-table td {
+                padding: 1rem;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-card {
+                padding: 1rem;
+            }
+            
+            .filter-card .col-md-2,
+            .filter-card .col-md-3 {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .btn-primary-custom,
+            .btn-secondary-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .page-content {
+                margin: 1rem auto;
+            }
+            
+            .page-title {
+                font-size: 1.75rem;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .custom-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .btn-action {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+        }
+        
+        /* Mobile menu toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        @media (max-width: 992px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--bg-elevated);
+                flex-direction: column;
+                align-items: stretch;
+                padding: 1rem;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 99;
+            }
+            
+            .menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            .menu-link {
+                padding: 0.75rem;
+                border-radius: var(--radius);
+                margin-bottom: 0.25rem;
+            }
+            
+            .menu-link:hover, .menu-link.active {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+            
+            .menu-link.active::after {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<div class="container py-3">
-
-    <!-- Back & Add Buttons -->
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <a href="{% url 'home' %}" class="btn btn-secondary mb-2">
-            <i class="bi bi-arrow-left-circle me-1"></i> Back to Home
-        </a>
-        <a href="{% url 'add_income' %}" class="btn btn-success mb-2">
-            <i class="bi bi-plus-circle me-1"></i> Add Income
-        </a>
-    </div>
-
-    <!-- Header -->
-    <h2 class="fw-bold mb-2">💰 Income Records of {{ request.user.first_name }}</h2>
-    <p class="total-income mb-3">Total Income: ₹ {{ total_income }}</p>
-
-    <!-- Search -->
-    <div class="card p-3 mb-3 search-card">
-        <form method="GET" class="d-flex flex-wrap gap-2">
-            <input type="text" name="search" class="form-control flex-grow-1" placeholder="Search by source, category, notes...">
-            <button class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
-        </form>
-    </div>
-
-    <!-- Table -->
-    <div class="card table-card">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0 align-middle">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Source</th>
-                        <th>Category</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Notes</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for income in income %}
-                    <tr>
-                        <td>{{ income.income_id }}</td>
-                        <td class="fw-semibold">{{ income.source }}</td>
-                        <td><span class="category-badge {{ income.category }}">{{ income.get_category_display }}</span></td>
-                        <td>{{ income.date|date:"d M Y" }}</td>
-                        <td class="fw-bold text-success">₹ {{ income.amount }}</td>
-                        <td>{{ income.notes|default:"-" }}</td>
-                        <td class="d-flex gap-1 flex-wrap">
-                            <a href="{% url 'update_income' income.income_id %}" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a href="{% url 'delete_income' income.income_id %}" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center py-3 text-muted">No income records found.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+    <!-- TOP NAVIGATION -->
+    <div class="topnav">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="brand">
+            <i class="fas fa-chart-pie brand-icon"></i>
+            GULBEE LEDGER
+        </div>
+        <div class="menu" id="mainMenu">
+            <a href="{% url 'home' %}" class="menu-link">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'view_all_income' %}" class="menu-link active">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Income</span>
+            </a>
+            <a href="{% url 'view_all_expense' %}" class="menu-link">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Expense</span>
+            </a>
+            <a href="{% url 'view_all_emi' %}" class="menu-link">
+                <i class="fas fa-credit-card"></i>
+                <span>EMI</span>
+            </a>
+            <a href="{% url 'view_all' %}" class="menu-link">
+                <i class="fas fa-hand-holding-usd"></i>
+                <span>Debit</span>
+            </a>
+            <a href="{% url 'report_home' %}" class="menu-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+            <a href="{% url 'login' %}" class="menu-link logout-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
         </div>
     </div>
 
-</div>
+    <!-- MAIN CONTENT -->
+    <div class="page-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Income Records</h1>
+            <p class="user-welcome">Welcome, {{ request.user.first_name }} • Track and manage all your income sources</p>
+        </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="total-card">
+                <div class="total-label">
+                    <i class="fas fa-sack-dollar"></i>
+                    Total Income
+                </div>
+                <div class="total-amount">₹ {{ total_income }}</div>
+                <div class="total-sublabel">Across all income sources</div>
+            </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="header-actions">
+            <a href="{% url 'home' %}" class="btn-secondary-custom">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+            <a href="{% url 'add_income' %}" class="btn-primary-custom">
+                <i class="fas fa-plus-circle"></i>
+                Add New Income
+            </a>
+        </div>
+
+        <!-- Filter Card (Updated to match debit page style) -->
+        <div class="filter-card">
+            <div class="filter-title">
+                <i class="fas fa-filter"></i>
+                Filter Income Records
+            </div>
+            
+            <form method="GET" class="row g-3">
+                <!-- Search -->
+                <div class="col-md-3">
+                    <label class="form-label">Search</label>
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Search by source, notes..."
+                           value="{{ request.GET.search }}">
+                </div>
+                
+                <!-- Category -->
+                <div class="col-md-2">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        {% for category_key, category_label in categories %}
+                            <option value="{{ category_key }}"
+                                {% if request.GET.category == category_key %}selected{% endif %}>
+                                {{ category_label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Amount Range -->
+                <div class="col-md-2">
+                    <label class="form-label">Min Amount</label>
+                    <input type="number"
+                           name="amount_min"
+                           class="form-control"
+                           placeholder="₹ 0"
+                           value="{{ request.GET.amount_min }}"
+                           step="0.01"
+                           min="0">
+                </div>
+                
+                <div class="col-md-2">
+                    <label class="form-label">Max Amount</label>
+                    <input type="number"
+                           name="amount_max"
+                           class="form-control"
+                           placeholder="₹ 100000"
+                           value="{{ request.GET.amount_max }}"
+                           step="0.01"
+                           min="0">
+                </div>
+                
+                <!-- Date Range -->
+                <div class="col-md-2">
+                    <label class="form-label">From Date</label>
+                    <input type="date"
+                           name="date_from"
+                           class="form-control"
+                           value="{{ request.GET.date_from }}">
+                </div>
+                
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{% url 'view_all_income' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times me-1"></i>
+                            Clear
+                        </a>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-1"></i>
+                            Apply
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Active Filters Display -->
+            {% if request.GET %}
+            <div class="active-filters mt-3">
+                <span class="form-label mb-0">Active Filters:</span>
+                {% if request.GET.category %}
+                <span class="active-filter-badge">
+                    Category: {{ request.GET.category }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'category' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if request.GET.date_from %}
+                <span class="active-filter-badge">
+                    From: {{ request.GET.date_from }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'date_from' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if request.GET.date_to %}
+                <span class="active-filter-badge">
+                    To: {{ request.GET.date_to }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'date_to' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if request.GET.amount_min %}
+                <span class="active-filter-badge">
+                    Min: ₹{{ request.GET.amount_min }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'amount_min' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if request.GET.amount_max %}
+                <span class="active-filter-badge">
+                    Max: ₹{{ request.GET.amount_max }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'amount_max' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+                
+                {% if request.GET.source %}
+                <span class="active-filter-badge">
+                    Source: {{ request.GET.source }}
+                    <a href="?{% for key, value in request.GET.items %}{% if key != 'source' %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endif %}{% endfor %}" 
+                       class="remove-filter" title="Remove filter">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Income Table -->
+        <div class="table-card">
+            {% if income %}
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Source</th>
+                            <th>Category</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inc in income %}
+                        <tr>
+                            <td>
+                                <span class="">{{ inc.income_id }}</span>
+                            </td>
+                            <td class="fw-semibold">
+                                <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                {{ inc.source }}
+                            </td>
+                            <td>
+                                <span class="category-badge {{ inc.category }}">
+                                    {{ inc.get_category_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                {{ inc.date|date:"d M Y" }}
+                            </td>
+                            <td class="income-amount">
+                                ₹ {{ inc.amount }}
+                            </td>
+                            <td>
+                                {% if inc.notes %}
+                                    <span class="text-light">{{ inc.notes|truncatechars:30 }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'update_income' inc.income_id %}" 
+                                       class="btn-action btn-edit"
+                                       title="Edit Income">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'delete_income' inc.income_id %}" 
+                                       class="btn-action btn-delete"
+                                       title="Delete Income">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if income.has_other_pages %}
+            <div class="pagination-container">
+                <div class="pagination">
+                    {% if income.has_previous %}
+                        <a href="?page={{ income.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="page-link">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {% endif %}
+
+                    {% for num in income.paginator.page_range %}
+                        {% if income.number == num %}
+                            <span class="page-link active">{{ num }}</span>
+                        {% elif num > income.number|add:'-3' and num < income.number|add:'3' %}
+                            <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="page-link">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if income.has_next %}
+                        <a href="?page={{ income.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                           class="page-link">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h4>No Income Records Found</h4>
+                <p class="mb-4">Try adjusting your filters or add your first income record.</p>
+                <a href="{% url 'add_income' %}" class="btn-primary-custom">
+                    <i class="fas fa-plus-circle"></i>
+                    Add Your First Income
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mainMenu = document.getElementById('mainMenu');
+            
+            mobileMenuToggle.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Add animations to cards
+            const cards = document.querySelectorAll('.total-card, .table-card, .filter-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + (index * 100));
+            });
+            
+            // Add hover effect to table rows
+            const tableRows = document.querySelectorAll('.custom-table tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(5px)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+            
+            // Confirm delete action
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to delete this income record? This action cannot be undone.')) {
+                        e.preventDefault();
+                    }
+                });
+            });
+            
+            // Date validation
+            const dateFrom = document.querySelector('input[name="date_from"]');
+            const dateTo = document.querySelector('input[name="date_to"]');
+            
+            if (dateFrom && dateTo) {
+                dateFrom.addEventListener('change', function() {
+                    if (dateTo.value && this.value > dateTo.value) {
+                        alert('Start date cannot be after end date');
+                        this.value = '';
+                    }
+                });
+                
+                dateTo.addEventListener('change', function() {
+                    if (dateFrom.value && this.value < dateFrom.value) {
+                        alert('End date cannot be before start date');
+                        this.value = '';
+                    }
+                });
+            }
+            
+            // Amount validation
+            const amountMin = document.querySelector('input[name="amount_min"]');
+            const amountMax = document.querySelector('input[name="amount_max"]');
+            
+            if (amountMin && amountMax) {
+                amountMin.addEventListener('change', function() {
+                    if (amountMax.value && parseFloat(this.value) > parseFloat(amountMax.value)) {
+                        alert('Minimum amount cannot be greater than maximum amount');
+                        this.value = '';
+                    }
+                });
+                
+                amountMax.addEventListener('change', function() {
+                    if (amountMin.value && parseFloat(this.value) < parseFloat(amountMin.value)) {
+                        alert('Maximum amount cannot be less than minimum amount');
+                        this.value = '';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

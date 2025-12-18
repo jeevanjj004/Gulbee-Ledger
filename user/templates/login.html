@@ -69,7 +69,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
         
         /* ================= LOGIN CONTAINER ================= */
@@ -82,7 +82,7 @@
         /* ================= BRAND HEADER ================= */
         .brand-header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
         
         .brand-logo {
@@ -120,6 +120,7 @@
             color: var(--text-muted);
             font-size: 0.95rem;
             margin-top: 0.5rem;
+            line-height: 1.5;
         }
         
         /* ================= LOGIN CARD ================= */
@@ -147,12 +148,15 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            text-align: center;
         }
         
         .login-subheader {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.5;
         }
         
         /* ================= FORM STYLES ================= */
@@ -206,12 +210,12 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 6px;
+            border-radius: 8px;
             transition: var(--transition);
             z-index: 10;
         }
@@ -221,13 +225,12 @@
             background: rgba(255, 255, 255, 0.05);
         }
         
-        /* Override Bootstrap text colors */
-        .text-muted {
-            color: var(--text-muted) !important;
-        }
-        
-        .text-light {
-            color: var(--text-light) !important;
+        /* Touch-friendly button for mobile */
+        @media (hover: none) {
+            .password-toggle:active {
+                color: var(--text-light);
+                background: rgba(255, 255, 255, 0.05);
+            }
         }
         
         /* ================= MESSAGES/ALERTS ================= */
@@ -242,17 +245,18 @@
             font-weight: 500;
             border: none;
             margin-bottom: 1rem;
+            text-align: center;
         }
         
         .alert-danger {
             background: var(--danger-light);
-            color: #fca5a5 !important; /* Force color override */
+            color: #fca5a5 !important;
             border-left: 4px solid var(--danger);
         }
         
         .alert-success {
             background: var(--success-light);
-            color: #a7f3d0 !important; /* Force color override */
+            color: #a7f3d0 !important;
             border-left: 4px solid var(--success);
         }
         
@@ -261,7 +265,7 @@
             padding: 0.875rem 1.5rem;
             border-radius: var(--radius);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
             transition: var(--transition);
@@ -270,12 +274,13 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            width: 100%;
+            min-height: 48px; /* Touch-friendly height */
         }
         
         .btn-primary {
             background: var(--primary-gradient);
             color: white;
-            width: 100%;
         }
         
         .btn-primary:hover {
@@ -303,19 +308,25 @@
             align-items: center;
             gap: 0.5rem;
             transition: var(--transition);
+            font-size: 0.95rem;
+            padding: 0.5rem;
+            border-radius: 8px;
         }
         
         .signup-link:hover {
             color: var(--text-light);
             gap: 0.75rem;
+            background: rgba(59, 130, 246, 0.1);
         }
         
         /* ================= FOOTER ================= */
         .login-footer {
             text-align: center;
-            margin-top: 2.5rem;
+            margin-top: 2rem;
             color: var(--text-muted);
             font-size: 0.85rem;
+            padding: 0 1rem;
+            line-height: 1.5;
         }
         
         /* ================= ERROR STYLES ================= */
@@ -334,33 +345,209 @@
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
         
-        /* ================= RESPONSIVE DESIGN ================= */
-        @media (max-width: 576px) {
+        /* ================= ENHANCED RESPONSIVE DESIGN ================= */
+        
+        /* Tablet and Mobile (768px and below) */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+            
             .login-container {
                 max-width: 100%;
             }
             
             .login-card {
                 padding: 2rem 1.5rem;
+                box-shadow: 0 10px 30px var(--shadow-lg);
             }
             
             .brand-text {
                 font-size: 1.75rem;
             }
             
+            .brand-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 1.3rem;
+            }
+            
             .login-header {
                 font-size: 1.5rem;
             }
+            
+            .login-subheader {
+                font-size: 0.9rem;
+            }
         }
         
-        @media (max-width: 400px) {
-            .brand-logo {
-                flex-direction: column;
-                gap: 0.5rem;
+        /* Small Mobile (576px and below) */
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+                padding-top: 1.5rem;
             }
             
             .login-card {
                 padding: 1.75rem 1.25rem;
+                border-radius: 14px;
+            }
+            
+            .brand-logo {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+            
+            .brand-text {
+                font-size: 1.5rem;
+            }
+            
+            .brand-tagline {
+                font-size: 0.85rem;
+                padding: 0 0.5rem;
+            }
+            
+            .login-header {
+                font-size: 1.4rem;
+            }
+            
+            .login-subheader {
+                font-size: 0.85rem;
+                margin-bottom: 1.25rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+            
+            .form-input {
+                padding: 0.75rem 1rem;
+                padding-right: 50px; /* More space for touch */
+                font-size: 1rem; /* Larger font for mobile */
+            }
+            
+            .form-label {
+                font-size: 0.95rem;
+            }
+            
+            .password-toggle {
+                width: 44px;
+                height: 44px;
+                right: 8px;
+            }
+            
+            .btn {
+                min-height: 52px; /* Larger touch target */
+                font-size: 1.05rem;
+            }
+            
+            .signup-link {
+                font-size: 1rem;
+                padding: 0.75rem;
+            }
+        }
+        
+        /* Very Small Mobile (400px and below) */
+        @media (max-width: 400px) {
+            body {
+                padding: 8px;
+                padding-top: 1rem;
+            }
+            
+            .login-card {
+                padding: 1.5rem 1rem;
+            }
+            
+            .brand-text {
+                font-size: 1.3rem;
+            }
+            
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .login-header {
+                font-size: 1.3rem;
+            }
+            
+            .form-input {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                min-height: 50px;
+                font-size: 1rem;
+            }
+        }
+        
+        /* Extra Small (320px and below) */
+        @media (max-width: 320px) {
+            .brand-text {
+                font-size: 1.2rem;
+            }
+            
+            .brand-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+            
+            .login-header {
+                font-size: 1.2rem;
+            }
+            
+            .login-subheader {
+                font-size: 0.8rem;
+            }
+            
+            .form-input {
+                padding: 0.7rem 0.875rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1.25rem;
+                min-height: 48px;
+            }
+        }
+        
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                align-items: flex-start;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            
+            .login-container {
+                max-width: 90%;
+            }
+            
+            .brand-header {
+                margin-bottom: 1.5rem;
+            }
+            
+            .login-card {
+                padding: 1.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        /* Large Screens */
+        @media (min-width: 1200px) {
+            .login-container {
+                max-width: 450px;
+            }
+            
+            .login-card {
+                padding: 3rem;
             }
         }
         
@@ -382,6 +569,22 @@
         
         .brand-header {
             animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        
+        /* Remove hover effects on touch devices */
+        @media (hover: none) {
+            .login-card:hover {
+                transform: none;
+            }
+            
+            .btn-primary:hover {
+                transform: none;
+            }
+            
+            .signup-link:hover {
+                gap: 0.5rem;
+                background: transparent;
+            }
         }
     </style>
 </head>
@@ -450,7 +653,8 @@
                                autocomplete="current-password">
                         <button type="button" 
                                 class="password-toggle" 
-                                id="togglePasswordBtn">
+                                id="togglePasswordBtn"
+                                aria-label="Toggle password visibility">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
@@ -467,12 +671,21 @@
             </form>
             
             <!-- Sign Up Link -->
-            <div class="signup-section">
-                <a href="{% url 'add_user' %}" class="signup-link">
-                    <i class="fas fa-user-plus"></i>
-                    Create New Account
-                </a>
-            </div>
+<div class="signup-section">
+    <a href="{% url 'add_user' %}" class="signup-link">
+        <i class="fas fa-user-plus"></i>
+        Create New Account
+    </a>
+    <br>
+    <a href="" class="signup-link">
+        Forgot Password?
+    </a>
+</div>
+
+
+
+
+            
         </div>
         
         <!-- Footer -->
@@ -492,10 +705,12 @@
                 passwordField.type = 'text';
                 icon.classList.remove('fa-eye');
                 icon.classList.add('fa-eye-slash');
+                this.setAttribute('aria-label', 'Hide password');
             } else {
                 passwordField.type = 'password';
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
+                this.setAttribute('aria-label', 'Show password');
             }
         });
         
@@ -557,11 +772,31 @@
             // Add enter key submission
             form.addEventListener('keypress', function(event) {
                 if (event.key === 'Enter') {
-                    // Prevent default to allow our validation to run
                     event.preventDefault();
                     form.dispatchEvent(new Event('submit'));
                 }
             });
+            
+            // Mobile-specific optimizations
+            function isMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            }
+            
+            if (isMobile()) {
+                // Auto-focus on first input on mobile for better UX
+                if (window.innerWidth > 768) {
+                    emailField.focus();
+                }
+                
+                // Prevent zoom on input focus
+                emailField.addEventListener('focus', function() {
+                    this.style.fontSize = '16px'; // Prevents iOS zoom
+                });
+                
+                passwordField.addEventListener('focus', function() {
+                    this.style.fontSize = '16px'; // Prevents iOS zoom
+                });
+            }
         });
         
         // Add animation to form elements
@@ -581,5 +816,3 @@
     </script>
 </body>
 </html>
-
-        <!-- comment for checking git -->
