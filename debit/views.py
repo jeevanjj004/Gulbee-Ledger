@@ -10,52 +10,56 @@ from django.urls import reverse
 from django.db.models import Sum, Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-
 @login_required
 def view_all_debit(request):
     debits = Debit.objects.filter(user=request.user)
 
-    # ---- GET PARAMS ----
+    # GET params
     search = request.GET.get("search")
     status = request.GET.get("status")
     is_emi = request.GET.get("is_emi")
     start_date = request.GET.get("start_date")
     end_date = request.GET.get("end_date")
 
-    # ---- SEARCH ----
+    # SEARCH
     if search:
         debits = debits.filter(
-            Q(debit_id__icontains=search) |
-            Q(lender_name__icontains=search)
+            Q(lender_name__icontains=search) |
+            Q(debit_id__icontains=str(search))
         )
 
-    # ---- STATUS FILTER ----
+    # STATUS FILTER
     if status:
         debits = debits.filter(status=status)
 
-    # ---- EMI FILTER ----
+    # EMI FILTER
     if is_emi == "yes":
         debits = debits.filter(is_emi=True)
     elif is_emi == "no":
         debits = debits.filter(is_emi=False)
 
-    # ---- DATE FILTER ----
+    # DATE FILTER
+    from datetime import datetime
     if start_date:
-        debits = debits.filter(start_date__gte=start_date)
+        try:
+            start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+            debits = debits.filter(start_date__gte=start_date_obj)
+        except ValueError:
+            pass
 
     if end_date:
-        debits = debits.filter(start_date__lte=end_date)
+        try:
+            end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+            debits = debits.filter(start_date__lte=end_date_obj)
+        except ValueError:
+            pass
 
     debits = debits.order_by("-created_at")
-
     total_principal = debits.aggregate(total=Sum("amount"))["total"] or 0
 
-    # 🔥 DROPDOWN DATA FROM BACKEND
-    status_choices = [(s, s) for s in DebitStatus]
-    emi_choices = [
-        ("yes", "EMI"),
-        ("no", "No EMI")
-    ]
+    # DROPDOWN DATA
+    status_choices = [(s.value, s.label) for s in DebitStatus]  # fixed
+    emi_choices = [("yes", "EMI"), ("no", "No EMI")]
 
     context = {
         "debits": debits,

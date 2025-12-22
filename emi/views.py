@@ -13,12 +13,12 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-
 @login_required
 def view_emi(request):
-    emis = EMI.objects.filter(debit__user=request.user).order_by('debit', 'due_date')
-    
-    # Group EMIs by debit and calculate counts
+    emis = EMI.objects.filter(
+        debit__user=request.user
+    ).select_related("debit").order_by("debit", "due_date")
+
     debit_data = defaultdict(lambda: {
         'debit': None,
         'emis': [],
@@ -27,34 +27,31 @@ def view_emi(request):
         'paid_count': 0,
         'status': 'paid'
     })
-    for emi in emis:
-        print("EMI ID:", emi.emi_id)
-        print("Bill photo:", emi.bill_photo)
-        print("Bill photo URL:", emi.bill_photo.url if emi.bill_photo else "No bill")
+
     for emi in emis:
         debit = emi.debit
-        if debit not in debit_data:
+
+        if debit_data[debit]['debit'] is None:
             debit_data[debit]['debit'] = debit
-        
+
         debit_data[debit]['emis'].append(emi)
-        
+
         if emi.status == "OVERDUE":
             debit_data[debit]['overdue_count'] += 1
             debit_data[debit]['status'] = 'overdue'
+
         elif emi.status == "PENDING":
             debit_data[debit]['pending_count'] += 1
-            # Only set to pending if not already overdue
             if debit_data[debit]['status'] != 'overdue':
                 debit_data[debit]['status'] = 'pending'
+
         elif emi.status == "PAID":
             debit_data[debit]['paid_count'] += 1
-    
-    # Convert to list for template
+
     debit_groups = list(debit_data.values())
-    
+
     return render(request, "view_all_emi.html", {
         "debit_groups": debit_groups,
-        "emis": emis  # Keep this if you still need it elsewhere
     })
 
 

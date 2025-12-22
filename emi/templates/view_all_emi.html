@@ -1108,9 +1108,10 @@
                                                                     <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
                                                                 </a>
                                                             {% else %}
-                                                                <span class="bill-empty">No bill</span>
+                                                                <span class="bill-empty">No bill uploaded</span>
                                                             {% endif %}
                                                         </td>
+                                                        
                                                         <td data-label="Action">
                                                             <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
                                                                 <i class="fas fa-money-bill-wave"></i>
