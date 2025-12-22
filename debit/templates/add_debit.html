@@ -130,14 +130,7 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
         
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= PAGE CONTENT ================= */
         .page-content {
@@ -273,7 +266,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         
         .form-check-input {
@@ -307,6 +300,26 @@
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* ================= LAST INSTALLMENT SECTION ================= */
+        .last-installment-section {
+            background: rgba(30, 64, 175, 0.1);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: var(--transition);
+        }
+        
+        .last-installment-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
             margin-bottom: 1rem;
             display: flex;
             align-items: center;
@@ -478,6 +491,10 @@
             .emi-section {
                 padding: 1rem;
             }
+            
+            .last-installment-section {
+                padding: 1rem;
+            }
         }
         
         /* ================= ANIMATIONS ================= */
@@ -533,10 +550,28 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 
@@ -651,6 +686,7 @@
                         <input type="number" 
                                class="form-control"
                                name="installments"
+                               id="installments"
                                placeholder="Enter number of installments">
                     </div>
                     
@@ -670,8 +706,48 @@
                         <input type="number" 
                                class="form-control"
                                name="emi_amt"
+                               id="emi_amt"
                                placeholder="Enter custom EMI amount"
                                step="0.01">
+                    </div>
+                    
+                    <!-- DIFFERENT LAST INSTALLMENT SECTION (Only shown for CUSTOM type) -->
+                    <div id="different-last-installment-section" class="hidden">
+                        <!-- Different Last Installment Checkbox -->
+                        <div class="form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input"
+                                   name="different_last_installment" 
+                                   id="id_different_last_installment">
+                            <label class="form-check-label" for="id_different_last_installment">
+                                Last installment is different from others
+                            </label>
+                        </div>
+                        
+                        <!-- LAST INSTALLMENT SECTION -->
+                        <div id="last-installment-section" class="last-installment-section hidden">
+                            <div class="last-installment-title">
+                                <i class="fas fa-flag-checkered"></i>
+                                Final Installment Details
+                            </div>
+                            
+                            <!-- Last Installment Amount -->
+                            <div class="form-group">
+                                <label class="form-label">Final Installment Amount</label>
+                                <input type="number" 
+                                       class="form-control"
+                                       name="last_installment_amount"
+                                       id="last_installment_amount"
+                                       placeholder="Enter final installment amount"
+                                       step="0.01">
+                            </div>
+                            
+                            <!-- Info note about installments -->
+                            <div style="background: rgba(30, 64, 175, 0.1); padding: 0.75rem; border-radius: 8px; font-size: 0.9rem; color: var(--text-muted); border-left: 3px solid var(--primary);">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span id="installment-info">Regular installments: 0 × ₹0.00 = ₹0.00<br>Final installment: ₹0.00<br>Total: ₹0.00</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -750,26 +826,280 @@
         const emiType = document.getElementById("emi_type");
         const interestField = document.getElementById("interest-field");
         const customField = document.getElementById("custom-emi-field");
+        const diffLastInstallmentSection = document.getElementById("different-last-installment-section");
+        const diffLastInstallment = document.getElementById("id_different_last_installment");
+        const lastInstallmentSection = document.getElementById("last-installment-section");
+        const installmentsInput = document.getElementById("installments");
+        const lastInstallmentAmount = document.getElementById("last_installment_amount");
+        const emiAmountInput = document.getElementById("emi_amt");
+        const principalInput = document.querySelector("input[name='principal_amount']");
+        const installmentInfo = document.getElementById("installment-info");
         
         function toggleEmi() {
             emiSection.classList.toggle("hidden", !isEmi.checked);
+            if (!isEmi.checked) {
+                // Reset all EMI fields when EMI is unchecked
+                diffLastInstallment.checked = false;
+                lastInstallmentAmount.value = '';
+                toggleLastInstallment();
+                toggleDiffLastInstallmentSection();
+            }
         }
         
         function toggleType() {
             if (emiType.value === "CUSTOM") {
                 interestField.classList.add("hidden");
                 customField.classList.remove("hidden");
+                // Show different last installment section only for CUSTOM type
+                diffLastInstallmentSection.classList.remove("hidden");
+                calculateInstallmentInfo();
             } else {
                 interestField.classList.remove("hidden");
                 customField.classList.add("hidden");
+                // Hide different last installment section for non-CUSTOM types
+                diffLastInstallmentSection.classList.add("hidden");
+                // Also hide last installment section if it was shown
+                diffLastInstallment.checked = false;
+                lastInstallmentSection.classList.add("hidden");
+                installmentInfo.innerHTML = "Regular EMI will be calculated based on interest rate";
             }
         }
         
+        function toggleDiffLastInstallmentSection() {
+            // Only show the checkbox if EMI type is CUSTOM
+            if (emiType.value === "CUSTOM") {
+                diffLastInstallmentSection.classList.remove("hidden");
+            } else {
+                diffLastInstallmentSection.classList.add("hidden");
+                diffLastInstallment.checked = false;
+                toggleLastInstallment();
+            }
+        }
+        
+        function toggleLastInstallment() {
+            lastInstallmentSection.classList.toggle("hidden", !diffLastInstallment.checked);
+            if (diffLastInstallment.checked) {
+                calculateInstallmentInfo();
+            }
+        }
+        
+        function calculateInstallmentInfo() {
+    // Only calculate if EMI is checked, type is CUSTOM, and different last installment is checked
+            if (!isEmi.checked || emiType.value !== "CUSTOM" || !diffLastInstallment.checked) return;
+            
+            const installments = parseInt(installmentsInput.value) || 0;
+            const principal = parseFloat(principalInput.value) || 0;
+            const emiAmount = parseFloat(emiAmountInput.value) || 0;
+            const lastAmount = parseFloat(lastInstallmentAmount.value) || 0;
+            
+            if (installments > 1 && emiAmount > 0) {
+                const regularInstallments = installments - 1;
+                const regularTotal = regularInstallments * emiAmount;
+                const total = regularTotal + lastAmount;
+                
+                // Calculate difference between total and principal
+                const difference = total - principal;
+                let differenceText = "";
+                let statusClass = "";
+                
+                if (difference > 0) {
+                    differenceText = `Exceeds principal by: ₹${difference.toFixed(2)}`;
+                    statusClass = "danger";
+                } else if (difference < 0) {
+                    differenceText = `Less than principal by: ₹${Math.abs(difference).toFixed(2)}`;
+                    statusClass = "warning";
+                } else {
+                    differenceText = `Matches principal exactly ✓`;
+                    statusClass = "success";
+                }
+                
+                installmentInfo.innerHTML = `
+                    <div>Regular installments: ${regularInstallments} × ₹${emiAmount.toFixed(2)} = <strong>₹${regularTotal.toFixed(2)}</strong></div>
+                    <div>Final installment: ₹${lastAmount.toFixed(2)}</div>
+                    <div>Total: <strong>₹${total.toFixed(2)}</strong> (Principal: ₹${principal.toFixed(2)})</div>
+                    <div class="text-${statusClass} mt-1"><i class="fas fa-${statusClass === 'success' ? 'check-circle' : statusClass === 'warning' ? 'exclamation-triangle' : 'times-circle'}"></i> ${differenceText}</div>
+                `;
+            } else if (installments === 1) {
+                const difference = lastAmount - principal;
+                let differenceText = "";
+                let statusClass = "";
+                
+                if (difference > 0) {
+                    differenceText = `Exceeds principal by: ₹${difference.toFixed(2)}`;
+                    statusClass = "danger";
+                } else if (difference < 0) {
+                    differenceText = `Less than principal by: ₹${Math.abs(difference).toFixed(2)}`;
+                    statusClass = "warning";
+                } else {
+                    differenceText = `Matches principal exactly ✓`;
+                    statusClass = "success";
+                }
+                
+                installmentInfo.innerHTML = `
+                    <div>Only 1 installment: ₹${lastAmount.toFixed(2)}</div>
+                    <div>Total: <strong>₹${lastAmount.toFixed(2)}</strong> (Principal: ₹${principal.toFixed(2)})</div>
+                    <div class="text-${statusClass} mt-1"><i class="fas fa-${statusClass === 'success' ? 'check-circle' : statusClass === 'warning' ? 'exclamation-triangle' : 'times-circle'}"></i> ${differenceText}</div>
+                `;
+            } else {
+                installmentInfo.innerHTML = `
+                    <div class="text-muted"><i class="fas fa-info-circle"></i> Enter all values to see calculation</div>
+                    <div class="text-small mt-1">Total must equal principal amount (₹${principal.toFixed(2)})</div>
+                `;
+            }
+        }
+        
+        // Event listeners
         isEmi.addEventListener("change", toggleEmi);
         emiType.addEventListener("change", toggleType);
+        diffLastInstallment.addEventListener("change", toggleLastInstallment);
         
+        // Calculate installment info when inputs change
+        installmentsInput.addEventListener("input", calculateInstallmentInfo);
+        lastInstallmentAmount.addEventListener("input", calculateInstallmentInfo);
+        if (emiAmountInput) {
+            emiAmountInput.addEventListener("input", calculateInstallmentInfo);
+        }
+        principalInput.addEventListener("input", calculateInstallmentInfo);
+        
+        // Initialize
         toggleEmi();
         toggleType();
+        toggleLastInstallment();
+
+
+         // Handle form submission with AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            
+            // Show loading state
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Creating...';
+            submitButton.disabled = true;
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action || window.location.href, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    // Show success message
+                    showNotification('success', data.message || 'Debit created successfully');
+                    
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1500);
+                } else {
+                    // Show error message
+                    showNotification('error', data.message || 'An error occurred');
+                    
+                    // Reset button state
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('error', 'Network error. Please try again.');
+                
+                // Reset button state
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+    });
+    
+    // Function to show notifications
+    function showNotification(type, message) {
+        // Remove existing notifications
+        const existingNotification = document.querySelector('.alert-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `alert-notification alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        // Add icon based on type
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        notification.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas ${icon} me-2"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+    
+    // Add CSS for notification animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-notification {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: none;
+            border-radius: var(--radius);
+        }
+        
+        .alert-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .alert-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .alert-notification .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+        
+        .alert-notification .btn-close:hover {
+            opacity: 1;
+        }
+    `;
+    document.head.appendChild(style);
     </script>
 </body>
 </html>

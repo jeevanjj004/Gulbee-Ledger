@@ -133,18 +133,11 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
         
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= PAGE CONTENT ================= */
         .page-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
@@ -175,7 +168,7 @@
         /* ================= REPORTS GRID ================= */
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 2rem;
             margin-top: 2rem;
         }
@@ -367,64 +360,30 @@
             box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
         
-        /* ================= CARD CORNER ACCENTS ================= */
-        .corner-accent {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            opacity: 0;
-            transition: var(--transition);
-        }
-        
-        .corner-accent.top-left {
-            top: -10px;
-            left: -10px;
-            border-top: 3px solid;
-            border-left: 3px solid;
-            border-radius: var(--radius) 0 0 0;
-        }
-        
-        .corner-accent.bottom-right {
-            bottom: -10px;
-            right: -10px;
-            border-bottom: 3px solid;
-            border-right: 3px solid;
-            border-radius: 0 0 var(--radius) 0;
-        }
-        
-        .report-card:hover .corner-accent {
-            opacity: 1;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-        }
-        
-        .debit-card .corner-accent {
-            border-color: #ef4444;
-        }
-        
-        .emi-card .corner-accent {
-            border-color: #f59e0b;
-        }
-        
-        .income-card .corner-accent {
-            border-color: #10b981;
-        }
-        
-        .expense-card .corner-accent {
-            border-color: #3b82f6;
-        }
-        
         /* ================= RESPONSIVE STYLES ================= */
-        @media (max-width: 1024px) {
+        @media (max-width: 1200px) {
             .reports-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 1.5rem;
             }
+            
+            .page-content {
+                max-width: 900px;
+            }
         }
         
         @media (max-width: 768px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 2rem auto 0;
+            }
+            
+            .page-content {
+                margin: 1.5rem auto;
+                padding: 0 0.75rem;
+            }
+            
             .topnav {
                 padding: 0.75rem 1rem;
             }
@@ -433,19 +392,8 @@
                 font-size: 1.2rem;
             }
             
-            .page-content {
-                margin: 1.5rem auto;
-                padding: 0 0.75rem;
-            }
-            
             .page-title {
                 font-size: 2.5rem;
-            }
-            
-            .reports-grid {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-                margin: 2rem auto 0;
             }
             
             .report-card {
@@ -582,10 +530,28 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 
@@ -603,9 +569,6 @@
         <div class="reports-grid">
             <!-- Debit Report Card -->
             <div class="report-card debit-card">
-                <div class="corner-accent top-left"></div>
-                <div class="corner-accent bottom-right"></div>
-                
                 <div class="report-icon-wrapper">
                     <i class="fas fa-hand-holding-usd report-icon"></i>
                 </div>
@@ -623,9 +586,6 @@
 
             <!-- EMI Report Card -->
             <div class="report-card emi-card">
-                <div class="corner-accent top-left"></div>
-                <div class="corner-accent bottom-right"></div>
-                
                 <div class="report-icon-wrapper">
                     <i class="fas fa-credit-card report-icon"></i>
                 </div>
@@ -643,9 +603,6 @@
 
             <!-- Income Report Card -->
             <div class="report-card income-card">
-                <div class="corner-accent top-left"></div>
-                <div class="corner-accent bottom-right"></div>
-                
                 <div class="report-icon-wrapper">
                     <i class="fas fa-money-bill-wave report-icon"></i>
                 </div>
@@ -663,9 +620,6 @@
 
             <!-- Expense Report Card -->
             <div class="report-card expense-card">
-                <div class="corner-accent top-left"></div>
-                <div class="corner-accent bottom-right"></div>
-                
                 <div class="report-icon-wrapper">
                     <i class="fas fa-shopping-cart report-icon"></i>
                 </div>
@@ -718,50 +672,6 @@
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0) scale(1)';
                 }, 200 + (index * 200));
-            });
-            
-            // Add hover effect to report links
-            const reportLinks = document.querySelectorAll('.report-link');
-            reportLinks.forEach(link => {
-                link.addEventListener('mouseenter', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'translateX(5px)';
-                    }
-                });
-                
-                link.addEventListener('mouseleave', function() {
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.style.transform = 'translateX(0)';
-                    }
-                });
-            });
-            
-            // Parallax effect on cards
-            document.addEventListener('mousemove', function(e) {
-                const cards = document.querySelectorAll('.report-card');
-                const mouseX = e.clientX / window.innerWidth;
-                const mouseY = e.clientY / window.innerHeight;
-                
-                cards.forEach(card => {
-                    const rect = card.getBoundingClientRect();
-                    const cardCenterX = rect.left + rect.width / 2;
-                    const cardCenterY = rect.top + rect.height / 2;
-                    
-                    const distanceX = (e.clientX - cardCenterX) / window.innerWidth;
-                    const distanceY = (e.clientY - cardCenterY) / window.innerHeight;
-                    
-                    card.style.transform = `translateY(-10px) rotateX(${distanceY * 5}deg) rotateY(${distanceX * 5}deg)`;
-                });
-            });
-            
-            // Reset transform on mouse leave
-            document.addEventListener('mouseleave', function() {
-                const cards = document.querySelectorAll('.report-card');
-                cards.forEach(card => {
-                    card.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
-                });
             });
         });
     </script>

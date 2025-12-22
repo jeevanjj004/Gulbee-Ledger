@@ -26,6 +26,12 @@ class Debit(models.Model):
     lender_name = models.CharField(max_length=100)
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+    last_emi_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True
+    )
     interest_percent = models.DecimalField(max_digits=5, decimal_places=2)
 
     start_date = models.DateField()
@@ -61,6 +67,14 @@ class Debit(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+    def save(self, *args, **kwargs):
+        if self.last_emi_amount is None:
+            self.last_emi_amount = self.amount  # default same as normal EMI
+        super().save(*args, **kwargs)
+
+
 
     def __str__(self):
         return f"{self.debit_id} - {self.lender_name}"

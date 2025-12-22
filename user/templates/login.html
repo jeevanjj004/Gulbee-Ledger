@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – GULBEE LEDGER</title>
+    <title>GULBEE LEDGER - Smart Financial Management</title>
     
     <!-- Bootstrap & Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,40 +13,44 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ================= CSS VARIABLES (Matching Dashboard) ================= */
+        /* ================= CSS VARIABLES ================= */
         :root {
             --bg-main: #0f172a;
             --bg-surface: #1e293b;
             --bg-elevated: #162447;
-            --bg-card: rgba(30, 41, 59, 0.7);
-            --bg-hover: rgba(30, 41, 59, 0.9);
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #162447 100%);
             
             --primary: #3b82f6;
-            --primary-light: rgba(59, 130, 246, 0.1);
-            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 100%);
+            --primary-light: #60a5fa;
+            --primary-dark: #1d4ed8;
+            --primary-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+            --primary-glow: 0 0 40px rgba(59, 130, 246, 0.3);
             
             --success: #10b981;
-            --success-light: rgba(16, 185, 129, 0.1);
             --danger: #ef4444;
-            --danger-light: rgba(239, 68, 68, 0.1);
             --warning: #f59e0b;
-            --warning-light: rgba(245, 158, 11, 0.1);
+            --info: #0ea5e9;
             
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --text-light: #cbd5e1;
             
             --border: #334155;
-            --border-light: rgba(51, 65, 85, 0.3);
-            --shadow: rgba(0, 0, 0, 0.25);
-            --shadow-lg: rgba(0, 0, 0, 0.35);
-            
-            --radius: 12px;
             --radius-lg: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --transition-fast: all 0.2s ease;
+            --transition-smooth: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+            
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --shadow-sm: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
         
         /* ================= BASE STYLES ================= */
@@ -56,506 +60,39 @@
             box-sizing: border-box;
         }
         
+        html {
+            scroll-behavior: smooth;
+        }
+        
         body {
-            background-color: var(--bg-main);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            background: var(--bg-gradient);
             color: var(--text-main);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
+            overflow-x: hidden;
         }
         
-        /* ================= LOGIN CONTAINER ================= */
-        .login-container {
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto;
-        }
-        
-        /* ================= BRAND HEADER ================= */
-        .brand-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-        
-        .brand-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: var(--primary-gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-            box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
-        }
-        
-        .brand-text {
-            font-weight: 800;
-            font-size: 2rem;
-            letter-spacing: 1px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .brand-tagline {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-top: 0.5rem;
-            line-height: 1.5;
-        }
-        
-        /* ================= LOGIN CARD ================= */
-        .login-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-light);
-            padding: 2.5rem;
-            box-shadow: 0 20px 40px var(--shadow-lg);
-            transition: var(--transition);
-        }
-        
-        .login-card:hover {
-            border-color: var(--border);
-            box-shadow: 0 25px 50px var(--shadow);
-            transform: translateY(-5px);
-        }
-        
-        .login-header {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #ffffff, #93c5fd);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-align: center;
-        }
-        
-        .login-subheader {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            line-height: 1.5;
-        }
-        
-        /* ================= FORM STYLES ================= */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        .input-wrapper {
+        section {
+            padding: 5rem 0;
             position: relative;
         }
         
-        .form-input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            padding-right: 45px; /* Space for eye button */
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: var(--transition);
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-            background: rgba(15, 23, 42, 0.7);
-        }
-        
-        .form-input::placeholder {
-            color: var(--text-muted);
-        }
-        
-        /* Eye button styling */
-        .password-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            transition: var(--transition);
-            z-index: 10;
-        }
-        
-        .password-toggle:hover {
-            color: var(--text-light);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        /* Touch-friendly button for mobile */
-        @media (hover: none) {
-            .password-toggle:active {
-                color: var(--text-light);
-                background: rgba(255, 255, 255, 0.05);
-            }
-        }
-        
-        /* ================= MESSAGES/ALERTS ================= */
-        .alert-messages {
-            margin-bottom: 1.5rem;
-        }
-        
-        .alert {
-            padding: 0.875rem 1rem;
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            font-weight: 500;
-            border: none;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .alert-danger {
-            background: var(--danger-light);
-            color: #fca5a5 !important;
-            border-left: 4px solid var(--danger);
-        }
-        
-        .alert-success {
-            background: var(--success-light);
-            color: #a7f3d0 !important;
-            border-left: 4px solid var(--success);
-        }
-        
-        /* ================= BUTTON STYLES ================= */
-        .btn {
-            padding: 0.875rem 1.5rem;
-            border-radius: var(--radius);
-            font-weight: 600;
-            font-size: 1rem;
-            font-family: 'Inter', sans-serif;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            width: 100%;
-            min-height: 48px; /* Touch-friendly height */
-        }
-        
-        .btn-primary {
-            background: var(--primary-gradient);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        /* ================= SIGNUP LINK ================= */
-        .signup-section {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-light);
-            text-align: center;
-        }
-        
-        .signup-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            font-size: 0.95rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-        }
-        
-        .signup-link:hover {
-            color: var(--text-light);
-            gap: 0.75rem;
-            background: rgba(59, 130, 246, 0.1);
-        }
-        
-        /* ================= FOOTER ================= */
-        .login-footer {
-            text-align: center;
-            margin-top: 2rem;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            padding: 0 1rem;
-            line-height: 1.5;
-        }
-        
-        /* ================= ERROR STYLES ================= */
-        .error-message {
-            color: var(--danger);
-            font-size: 0.85rem;
-            margin-top: 0.25rem;
-            display: none;
-        }
-        
-        .form-input.error {
-            border-color: var(--danger);
-        }
-        
-        .form-input.error:focus {
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
-        }
-        
-        /* ================= ENHANCED RESPONSIVE DESIGN ================= */
-        
-        /* Tablet and Mobile (768px and below) */
-        @media (max-width: 768px) {
-            body {
-                padding: 12px;
-                align-items: flex-start;
-                padding-top: 2rem;
-            }
-            
-            .login-container {
-                max-width: 100%;
-            }
-            
-            .login-card {
-                padding: 2rem 1.5rem;
-                box-shadow: 0 10px 30px var(--shadow-lg);
-            }
-            
-            .brand-text {
-                font-size: 1.75rem;
-            }
-            
-            .brand-icon {
-                width: 42px;
-                height: 42px;
-                font-size: 1.3rem;
-            }
-            
-            .login-header {
-                font-size: 1.5rem;
-            }
-            
-            .login-subheader {
-                font-size: 0.9rem;
-            }
-        }
-        
-        /* Small Mobile (576px and below) */
-        @media (max-width: 576px) {
-            body {
-                padding: 10px;
-                padding-top: 1.5rem;
-            }
-            
-            .login-card {
-                padding: 1.75rem 1.25rem;
-                border-radius: 14px;
-            }
-            
-            .brand-logo {
-                flex-direction: column;
-                gap: 0.75rem;
-                text-align: center;
-            }
-            
-            .brand-text {
-                font-size: 1.5rem;
-            }
-            
-            .brand-tagline {
-                font-size: 0.85rem;
-                padding: 0 0.5rem;
-            }
-            
-            .login-header {
-                font-size: 1.4rem;
-            }
-            
-            .login-subheader {
-                font-size: 0.85rem;
-                margin-bottom: 1.25rem;
-            }
-            
-            .form-group {
-                margin-bottom: 1.25rem;
-            }
-            
-            .form-input {
-                padding: 0.75rem 1rem;
-                padding-right: 50px; /* More space for touch */
-                font-size: 1rem; /* Larger font for mobile */
-            }
-            
-            .form-label {
-                font-size: 0.95rem;
-            }
-            
-            .password-toggle {
-                width: 44px;
-                height: 44px;
-                right: 8px;
-            }
-            
-            .btn {
-                min-height: 52px; /* Larger touch target */
-                font-size: 1.05rem;
-            }
-            
-            .signup-link {
-                font-size: 1rem;
-                padding: 0.75rem;
-            }
-        }
-        
-        /* Very Small Mobile (400px and below) */
-        @media (max-width: 400px) {
-            body {
-                padding: 8px;
-                padding-top: 1rem;
-            }
-            
-            .login-card {
-                padding: 1.5rem 1rem;
-            }
-            
-            .brand-text {
-                font-size: 1.3rem;
-            }
-            
-            .brand-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-            
-            .login-header {
-                font-size: 1.3rem;
-            }
-            
-            .form-input {
-                font-size: 1rem;
-            }
-            
-            .btn {
-                min-height: 50px;
-                font-size: 1rem;
-            }
-        }
-        
-        /* Extra Small (320px and below) */
-        @media (max-width: 320px) {
-            .brand-text {
-                font-size: 1.2rem;
-            }
-            
-            .brand-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 1.1rem;
-            }
-            
-            .login-header {
-                font-size: 1.2rem;
-            }
-            
-            .login-subheader {
-                font-size: 0.8rem;
-            }
-            
-            .form-input {
-                padding: 0.7rem 0.875rem;
-            }
-            
-            .btn {
-                padding: 0.75rem 1.25rem;
-                min-height: 48px;
-            }
-        }
-        
-        /* Landscape Mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            body {
-                align-items: flex-start;
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-            }
-            
-            .login-container {
-                max-width: 90%;
-            }
-            
-            .brand-header {
-                margin-bottom: 1.5rem;
-            }
-            
-            .login-card {
-                padding: 1.5rem;
-            }
-            
-            .form-group {
-                margin-bottom: 1rem;
-            }
-        }
-        
-        /* Large Screens */
-        @media (min-width: 1200px) {
-            .login-container {
-                max-width: 450px;
-            }
-            
-            .login-card {
-                padding: 3rem;
-            }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
         }
         
         /* ================= ANIMATIONS ================= */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -563,256 +100,1496 @@
             }
         }
         
-        .login-card {
-            animation: fadeInUp 0.6s ease-out;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         
-        .brand-header {
-            animation: fadeInUp 0.6s ease-out 0.2s both;
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
         }
         
-        /* Remove hover effects on touch devices */
-        @media (hover: none) {
-            .login-card:hover {
-                transform: none;
+        /* ================= NAVIGATION ================= */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.2rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-smooth);
+        }
+        
+        .navbar.scrolled {
+            padding: 0.8rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .navbar-brand {
+            font-weight: 900;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .brand-icon {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .btn-login {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--primary-glow);
+        }
+        
+        /* ================= HERO SECTION ================= */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-bg-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .particle {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .hero-title {
+            font-size: 3.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #93c5fd, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 2.5rem;
+            max-width: 600px;
+            opacity: 0.9;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-light);
+            font-size: 1.2rem;
+        }
+        
+        .stat-text {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        
+        .btn-get-started {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 1.1rem 2.8rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-get-started::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-get-started:hover::after {
+            left: 100%;
+        }
+        
+        .btn-get-started:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--primary-glow);
+        }
+        
+        /* ================= FEATURES SECTION ================= */
+        .features-section {
+            background: rgba(15, 23, 42, 0.5);
+            position: relative;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+        }
+        
+        .section-label {
+            display: inline-block;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .section-subtitle {
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: var(--transition-smooth);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: var(--primary-gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.8rem;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+        
+        .feature-desc {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .feature-list li i {
+            color: var(--success);
+            font-size: 0.9rem;
+        }
+        
+        /* ================= ROADMAP SECTION ================= */
+        .roadmap-section {
+            background: var(--bg-surface);
+            position: relative;
+        }
+        
+        .roadmap-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .roadmap-container::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-gradient);
+            opacity: 0.3;
+            border-radius: 3px;
+        }
+        
+        .roadmap-step {
+            display: flex;
+            margin-bottom: 4rem;
+            position: relative;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: var(--transition-smooth);
+        }
+        
+        .roadmap-step.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .step-number {
+            width: 100px;
+            height: 100px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            flex-shrink: 0;
+            margin-right: 3rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-grow: 1;
+            backdrop-filter: blur(10px);
+        }
+        
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .step-icon {
+            color: var(--primary-light);
+            font-size: 1.5rem;
+        }
+        
+        .step-desc {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .step-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .step-feature {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-light);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        /* ================= HOW IT WORKS SECTION ================= */
+        .how-it-works {
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .work-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-smooth);
+        }
+        
+        .work-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .work-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .work-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+        
+        .work-desc {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+        
+        /* ================= CTA SECTION ================= */
+        .cta-section {
+            text-align: center;
+            background: var(--primary-gradient);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><path d="M0,100 C250,0 750,0 1000,100 L1000,0 L0,0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: bottom;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .cta-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cta-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .btn-cta {
+            background: white;
+            color: var(--primary-dark);
+            padding: 1.2rem 3rem;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 1.1rem;
+            border: none;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* ================= FOOTER ================= */
+        .footer {
+            background: var(--bg-elevated);
+            padding: 5rem 0 2rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+        
+        .footer-brand h3 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-brand p {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-links h4 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 1.8rem;
+            color: var(--text-main);
+        }
+        
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-light);
+            transform: translateX(5px);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+        
+        .social-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-5px) rotate(5deg);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 3rem;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        /* ================= LOGIN MODAL ================= */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .login-modal-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(30px);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+            max-width: 450px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .login-modal.active .login-modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+        
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .close-modal {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition-smooth);
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            transform: rotate(90deg);
+        }
+        
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+        
+        .form-label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .btn-login-modal {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 1.1rem;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            width: 100%;
+            margin-top: 0.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-login-modal:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--primary-glow);
+        }
+        
+        .signup-link {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .signup-link a {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 800;
+            transition: var(--transition-fast);
+        }
+        
+        .signup-link a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        /* ================= RESPONSIVE ================= */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 3rem;
             }
             
-            .btn-primary:hover {
-                transform: none;
+            .section-title, .cta-title {
+                font-size: 2.5rem;
             }
             
-            .signup-link:hover {
-                gap: 0.5rem;
-                background: transparent;
+            .roadmap-container::before {
+                left: 40px;
+            }
+            
+            .step-number {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+                margin-right: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            section {
+                padding: 4rem 0;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-title, .cta-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .roadmap-container::before {
+                left: 35px;
+            }
+            
+            .step-number {
+                width: 70px;
+                height: 70px;
+                margin-right: 1.5rem;
+            }
+            
+            .step-content {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .btn-get-started, .btn-login {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .roadmap-container::before {
+                display: none;
+            }
+            
+            .step-number {
+                display: none;
+            }
+            
+            .login-modal-content {
+                padding: 2rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <!-- Brand Header -->
-        <div class="brand-header">
-            <div class="brand-logo">
-                <div class="brand-icon">
-                    <i class="fas fa-chart-pie"></i>
-                </div>
-                <div class="brand-text">GULBEE LEDGER</div>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-chart-pie brand-icon"></i>
+                    GULBEE LEDGER
+                </a>
+                <button class="btn-login" id="openLoginModal">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login
+                </button>
             </div>
-            <div class="brand-tagline">Your Personal Finance Management System</div>
         </div>
-        
-        <!-- Login Card -->
-        <div class="login-card">
-            <div class="login-header">Welcome Back</div>
-            <div class="login-subheader">Sign in to access your financial dashboard</div>
-            
-            <!-- Messages/Alerts -->
-            {% if messages %}
-                <div class="alert-messages">
-                    {% for m in messages %}
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            {{ m }}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-            
-            <!-- Login Form -->
-            <form method="POST" id="loginForm" novalidate>
-                {% csrf_token %}
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-bg-particles" id="particles"></div>
+        <div class="container">
+            <div class="hero-content fade-in-up">
+                <span class="hero-badge">
+                    <i class="fas fa-star me-2"></i>
+                    Trusted by 10,000+ Users Worldwide
+                </span>
+                <h1 class="hero-title">Master Your Finances with Intelligence</h1>
+                <p class="hero-subtitle">
+                    The all-in-one financial management platform that helps you track, analyze, and optimize 
+                    your income, expenses, EMIs, and debits. Gain complete control over your financial journey.
+                </p>
                 
-                <!-- Email Field -->
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-text">Real-time Tracking</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-text">Bank-level Security</div>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div>
+                            <div class="stat-text">Smart Analytics</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-get-started" id="openLoginModalHero">
+                    <i class="fas fa-rocket me-2"></i>
+                    Start Free Journey
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <span class="section-label">Powerful Features</span>
+                <h2 class="section-title">Everything You Need for Financial Success</h2>
+                <p class="section-subtitle">
+                    Comprehensive tools designed to simplify your financial management and help you make better decisions
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <!-- Income Management -->
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3 class="feature-title">Income Tracking</h3>
+                    <p class="feature-desc">
+                        Automatically categorize income sources, track earnings patterns, and generate income reports with intelligent insights.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Multiple income source tracking</li>
+                        <li><i class="fas fa-check"></i> Automatic categorization</li>
+                        <li><i class="fas fa-check"></i> Income trend analysis</li>
+                    </ul>
+                </div>
+                
+                <!-- Expense Management -->
+                <div class="feature-card fade-in-up" style="animation-delay: 0.1s">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3 class="feature-title">Expense Management</h3>
+                    <p class="feature-desc">
+                        Monitor spending across categories, set smart budgets, and receive real-time alerts to stay on track financially.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Category-wise expense tracking</li>
+                        <li><i class="fas fa-check"></i> Budget planning tools</li>
+                        <li><i class="fas fa-check"></i> Spending pattern insights</li>
+                    </ul>
+                </div>
+                
+                <!-- EMI Management -->
+                <div class="feature-card fade-in-up" style="animation-delay: 0.2s">
+                    <div class="feature-icon-wrapper">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h3 class="feature-title">EMI & Loan Tracking</h3>
+                    <p class="feature-desc">
+                        Manage all your EMIs in one place with automated reminders, payment scheduling, and loan progress tracking.
+                    </p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> EMI payment scheduler</li>
+                        <li><i class="fas fa-check"></i> Due date reminders</li>
+                        <li><i class="fas fa-check"></i> Loan payoff calculator</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <span class="section-label">Simple & Effective</span>
+                <h2 class="section-title">How Gulbee Ledger Works</h2>
+                <p class="section-subtitle">
+                    Get started in minutes with our simple 3-step process to financial clarity
+                </p>
+            </div>
+            
+            <div class="works-grid">
+                <div class="work-card fade-in-up">
+                    <div class="work-number">1</div>
+                    <h3 class="work-title">Sign Up & Connect</h3>
+                    <p class="work-desc">
+                        Create your free account and set up your financial profile in under 2 minutes.
+                    </p>
+                </div>
+                
+                <div class="work-card fade-in-up" style="animation-delay: 0.1s">
+                    <div class="work-number">2</div>
+                    <h3 class="work-title">Track & Categorize</h3>
+                    <p class="work-desc">
+                        Add your income sources, expenses, and EMIs. Our AI automatically categorizes them.
+                    </p>
+                </div>
+                
+                <div class="work-card fade-in-up" style="animation-delay: 0.2s">
+                    <div class="work-number">3</div>
+                    <h3 class="work-title">Analyze & Optimize</h3>
+                    <p class="work-desc">
+                        Use our insights to understand your finances and make informed decisions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="roadmap-section" id="roadmap">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <span class="section-label">Your Financial Journey</span>
+                <h2 class="section-title">Complete Financial Roadmap</h2>
+                <p class="section-subtitle">
+                    Follow our proven path to financial clarity and control
+                </p>
+            </div>
+            
+            <div class="roadmap-container">
+                <!-- Step 1 -->
+                <div class="roadmap-step" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3 class="step-title">
+                            <i class="fas fa-user-plus step-icon"></i>
+                            Account Setup & Profile Creation
+                        </h3>
+                        <p class="step-desc">
+                            Begin by creating your personalized account. Set up your financial profile, 
+                            connect your income sources, and define your financial goals.
+                        </p>
+                        <div class="step-features">
+                            <span class="step-feature">Secure Registration</span>
+                            <span class="step-feature">Profile Setup</span>
+                            <span class="step-feature">Goal Setting</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="roadmap-step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3 class="step-title">
+                            <i class="fas fa-chart-line step-icon"></i>
+                            Income & Expense Tracking
+                        </h3>
+                        <p class="step-desc">
+                            Start tracking all your financial transactions. Categorize income streams, 
+                            monitor expenses, and set up automatic categorization rules.
+                        </p>
+                        <div class="step-features">
+                            <span class="step-feature">Transaction Logging</span>
+                            <span class="step-feature">Smart Categorization</span>
+                            <span class="step-feature">Real-time Updates</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="roadmap-step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3 class="step-title">
+                            <i class="fas fa-calculator step-icon"></i>
+                            EMI & Debt Management
+                        </h3>
+                        <p class="step-desc">
+                            Set up and track all your EMIs and loans. Schedule payments, 
+                            monitor due dates, and track your debt repayment progress.
+                        </p>
+                        <div class="step-features">
+                            <span class="step-feature">Payment Scheduling</span>
+                            <span class="step-feature">Due Date Alerts</span>
+                            <span class="step-feature">Debt Progress Tracking</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="roadmap-step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3 class="step-title">
+                            <i class="fas fa-chart-pie step-icon"></i>
+                            Analysis & Reporting
+                        </h3>
+                        <p class="step-desc">
+                            Generate comprehensive financial reports, analyze spending patterns, 
+                            and get actionable insights to optimize your finances.
+                        </p>
+                        <div class="step-features">
+                            <span class="step-feature">Financial Reports</span>
+                            <span class="step-feature">Trend Analysis</span>
+                            <span class="step-feature">Insight Generation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content fade-in-up">
+                <h2 class="cta-title">Ready to Transform Your Finances?</h2>
+                <p class="cta-subtitle">
+                    Join thousands who have achieved financial clarity with Gulbee Ledger. 
+                    Start your journey today - it's free and takes just 2 minutes.
+                </p>
+                <button class="btn-cta" id="openLoginModalCTA">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Get Started for Free
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>GULBEE LEDGER</h3>
+                    <p>
+                        Empowering individuals and businesses with intelligent financial 
+                        management tools for a secure financial future.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#features"><i class="fas fa-chevron-right"></i> Features</a></li>
+                        <li><a href="#how-it-works"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+                        <li><a href="#roadmap"><i class="fas fa-chevron-right"></i> Financial Roadmap</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Pricing</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li>
+                            <a href="mailto:gulbeeledger@gmail.com">
+                                <i class="fas fa-envelope"></i>
+                                gulbeeledger@gmail.com
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fas fa-phone"></i>
+                                +1 (555) 123-4567
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Financial District, NYC
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 GULBEE LEDGER. All rights reserved. | <a href="#" style="color: var(--primary-light); text-decoration: none;">Privacy Policy</a> | <a href="#" style="color: var(--primary-light); text-decoration: none;">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Welcome Back!</h3>
+                <button class="close-modal" id="closeLoginModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form method="POST" id="loginForm" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div id="loginMessage" style="
+                    display: none;
+                    margin-bottom: 20px;
+                    padding: 15px;
+                    border-radius: var(--radius-md);
+                    font-weight: 700;
+                    text-align: center;
+                    font-size: 0.95rem;
+                "></div>
+
                 <div class="form-group">
                     <label for="id_username" class="form-label">Email Address</label>
-                    <div class="input-wrapper">
-                        <input type="email" 
-                               name="username" 
-                               id="id_username" 
-                               class="form-input" 
-                               placeholder="Enter your email address"
-                               required
-                               autocomplete="username">
-                    </div>
-                    <div class="error-message" id="email-error">
-                        Please enter a valid email address.
-                    </div>
+                    <input type="email" 
+                           name="username" 
+                           id="id_username" 
+                           class="form-input" 
+                           placeholder="Enter your email"
+                           required
+                           autocomplete="username">
                 </div>
-                
-                <!-- Password Field -->
                 <div class="form-group">
                     <label for="id_password" class="form-label">Password</label>
-                    <div class="input-wrapper">
-                        <input type="password" 
-                               name="password" 
-                               id="id_password" 
-                               class="form-input" 
-                               placeholder="Enter your password"
-                               required
-                               autocomplete="current-password">
-                        <button type="button" 
-                                class="password-toggle" 
-                                id="togglePasswordBtn"
-                                aria-label="Toggle password visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <div class="error-message" id="password-error">
-                        Password is required.
-                    </div>
+                    <input type="password" 
+                           name="password" 
+                           id="id_password" 
+                           class="form-input" 
+                           placeholder="Enter your password"
+                           required
+                           autocomplete="current-password">
                 </div>
-                
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Log In
+                <button type="submit" class="btn-login-modal">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login to Dashboard
                 </button>
+                <div class="signup-link">
+                    <span>New to Gulbee Ledger? </span>
+                    <a href="{% url 'add_user' %}">Create your free account</a>
+                </div>
             </form>
-            
-            <!-- Sign Up Link -->
-<div class="signup-section">
-    <a href="{% url 'add_user' %}" class="signup-link">
-        <i class="fas fa-user-plus"></i>
-        Create New Account
-    </a>
-    <br>
-    <a href="" class="signup-link">
-        Forgot Password?
-    </a>
-</div>
-
-
-
-
-            
-        </div>
-        
-        <!-- Footer -->
-        <div class="login-footer">
-            <p>© 2025 GULBEE LEDGER. All rights reserved.</p>
         </div>
     </div>
 
     <!-- JavaScript -->
     <script>
-        // Toggle Password Visibility
-        document.getElementById('togglePasswordBtn').addEventListener('click', function() {
-            const passwordField = document.getElementById('id_password');
-            const icon = this.querySelector('i');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-                this.setAttribute('aria-label', 'Hide password');
-            } else {
-                passwordField.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-                this.setAttribute('aria-label', 'Show password');
-            }
-        });
+        document.addEventListener('DOMContentLoaded', function () {
         
-        // Form Validation
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const emailField = document.getElementById('id_username');
-            const passwordField = document.getElementById('id_password');
-            const emailError = document.getElementById('email-error');
-            const passwordError = document.getElementById('password-error');
-            
-            // Clear validation on input
-            emailField.addEventListener('input', function() {
-                this.classList.remove('error');
-                emailError.style.display = 'none';
-            });
-            
-            passwordField.addEventListener('input', function() {
-                this.classList.remove('error');
-                passwordError.style.display = 'none';
-            });
-            
-            // Form submission validation
-            form.addEventListener('submit', function(event) {
-                let isValid = true;
-                
-                // Validate email
-                if (!emailField.value.trim()) {
-                    emailField.classList.add('error');
-                    emailError.textContent = 'Please enter your email address.';
-                    emailError.style.display = 'block';
-                    isValid = false;
-                } else if (!isValidEmail(emailField.value)) {
-                    emailField.classList.add('error');
-                    emailError.textContent = 'Please enter a valid email address.';
-                    emailError.style.display = 'block';
-                    isValid = false;
-                }
-                
-                // Validate password
-                if (!passwordField.value.trim()) {
-                    passwordField.classList.add('error');
-                    passwordError.textContent = 'Please enter your password.';
-                    passwordError.style.display = 'block';
-                    isValid = false;
-                }
-                
-                if (!isValid) {
-                    event.preventDefault();
-                }
-            });
-            
-            // Email validation helper
-            function isValidEmail(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
-            
-            // Add enter key submission
-            form.addEventListener('keypress', function(event) {
-                if (event.key === 'Enter') {
-                    event.preventDefault();
-                    form.dispatchEvent(new Event('submit'));
-                }
-            });
-            
-            // Mobile-specific optimizations
-            function isMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            }
-            
-            if (isMobile()) {
-                // Auto-focus on first input on mobile for better UX
-                if (window.innerWidth > 768) {
-                    emailField.focus();
-                }
-                
-                // Prevent zoom on input focus
-                emailField.addEventListener('focus', function() {
-                    this.style.fontSize = '16px'; // Prevents iOS zoom
+            /* ================= MODAL ELEMENTS ================= */
+            const loginModal = document.getElementById('loginModal');
+            const openLoginModalBtn = document.getElementById('openLoginModal');
+            const openLoginModalHeroBtn = document.getElementById('openLoginModalHero');
+            const openLoginModalCTABtn = document.getElementById('openLoginModalCTA');
+            const closeLoginModalBtn = document.getElementById('closeLoginModal');
+        
+            /* ================= OPEN MODAL ================= */
+            [openLoginModalBtn, openLoginModalHeroBtn, openLoginModalCTABtn].forEach(btn => {
+                btn?.addEventListener('click', () => {
+                    loginModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
                 });
-                
-                passwordField.addEventListener('focus', function() {
-                    this.style.fontSize = '16px'; // Prevents iOS zoom
+            });
+        
+            /* ================= CLOSE MODAL ================= */
+            closeLoginModalBtn?.addEventListener('click', () => {
+                loginModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal) {
+                    loginModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        
+            /* ================= NAVBAR SCROLL EFFECT ================= */
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        
+            /* ================= PARTICLES BACKGROUND ================= */
+            const particlesContainer = document.getElementById('particles');
+            if (particlesContainer) {
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    const size = Math.random() * 100 + 50;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    particle.style.opacity = Math.random() * 0.1 + 0.05;
+                    
+                    particle.style.background = `radial-gradient(circle at center, var(--primary) 0%, transparent 70%)`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+        
+            /* ================= ROADMAP ANIMATION ================= */
+            const roadmapSteps = document.querySelectorAll('.roadmap-step');
+            
+            function checkRoadmapVisibility() {
+                roadmapSteps.forEach(step => {
+                    const stepTop = step.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (stepTop < windowHeight * 0.8) {
+                        step.classList.add('visible');
+                    }
                 });
             }
-        });
+            
+            // Initial check
+            checkRoadmapVisibility();
+            
+            // Check on scroll
+            window.addEventListener('scroll', checkRoadmapVisibility);
         
-        // Add animation to form elements
-        document.addEventListener('DOMContentLoaded', function() {
-            const formGroups = document.querySelectorAll('.form-group');
-            formGroups.forEach((group, index) => {
-                group.style.opacity = '0';
-                group.style.transform = 'translateY(10px)';
-                
-                setTimeout(() => {
-                    group.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    group.style.opacity = '1';
-                    group.style.transform = 'translateY(0)';
-                }, 300 + (index * 100));
+            /* ================= LOGIN FORM ================= */
+            const loginForm = document.getElementById('loginForm');
+            const loginMessage = document.getElementById('loginMessage');
+        
+            if (loginForm) {
+                loginForm.addEventListener('submit', function (e) {
+                    e.preventDefault(); // stop normal submit
+        
+                    const email = document.getElementById('id_username');
+                    const password = document.getElementById('id_password');
+                    let isValid = true;
+        
+                    // Reset styles
+                    email.style.borderColor = '';
+                    password.style.borderColor = '';
+        
+                    // Frontend validation
+                    if (!email.value.trim()) {
+                        email.style.borderColor = 'var(--danger)';
+                        isValid = false;
+                    }
+        
+                    if (!password.value.trim()) {
+                        password.style.borderColor = 'var(--danger)';
+                        isValid = false;
+                    }
+        
+                    if (!isValid) return;
+        
+                    // Prepare data
+                    const formData = new FormData(loginForm);
+        
+                    fetch(loginForm.action, {
+                        method: "POST",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+        
+                        loginMessage.style.display = "block";
+        
+                        if (data.status === "success") {
+                            loginMessage.style.background = "linear-gradient(135deg, var(--success) 0%, #059669 100%)";
+                            loginMessage.style.color = "#ffffff";
+                            loginMessage.innerText = data.message || "Login successful";
+        
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url || "/";
+                            }, 800);
+        
+                        } else {
+                            loginMessage.style.background = "linear-gradient(135deg, var(--danger) 0%, #dc2626 100%)";
+                            loginMessage.style.color = "#ffffff";
+                            loginMessage.innerText = data.message || "Invalid credentials";
+                        }
+                    })
+                    .catch(() => {
+                        loginMessage.style.display = "block";
+                        loginMessage.style.background = "linear-gradient(135deg, var(--danger) 0%, #dc2626 100%)";
+                        loginMessage.style.color = "#ffffff";
+                        loginMessage.innerText = "Server error. Please try again.";
+                    });
+                });
+        
+                // Clear error on typing
+                loginForm.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', function () {
+                        this.style.borderColor = '';
+                    });
+                });
+            }
+        
+            /* ================= SMOOTH SCROLL ================= */
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#') {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(href);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
             });
+        
+            /* ================= FADE IN ANIMATIONS ================= */
+            const fadeElements = document.querySelectorAll('.fade-in-up');
+            
+            function checkFadeElements() {
+                fadeElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementTop < windowHeight * 0.9) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
+            // Initial check
+            checkFadeElements();
+            
+            // Check on scroll
+            window.addEventListener('scroll', checkFadeElements);
+        
         });
-    </script>
+        </script>
+        
 </body>
 </html>

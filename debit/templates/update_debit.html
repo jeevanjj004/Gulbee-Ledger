@@ -130,14 +130,7 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
         
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= PAGE CONTENT ================= */
         .page-content {
@@ -644,10 +637,28 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 

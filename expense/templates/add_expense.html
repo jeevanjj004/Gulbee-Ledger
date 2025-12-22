@@ -134,14 +134,7 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
         
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= MAIN CONTENT ================= */
         .page-container {
@@ -553,10 +546,28 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 
@@ -703,14 +714,18 @@
 
     <!-- JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+        
+            /* =========================================================
+               MOBILE MENU TOGGLE
+            ========================================================= */
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mainMenu = document.getElementById('mainMenu');
-            
-            // Toggle mobile menu
-            mobileMenuToggle.addEventListener('click', function() {
+        
+            mobileMenuToggle.addEventListener('click', function () {
                 mainMenu.classList.toggle('active');
                 const icon = this.querySelector('i');
+        
                 if (mainMenu.classList.contains('active')) {
                     icon.classList.remove('fa-bars');
                     icon.classList.add('fa-times');
@@ -719,9 +734,9 @@
                     icon.classList.add('fa-bars');
                 }
             });
-            
+        
             // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
+            document.addEventListener('click', function (event) {
                 if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
                     mainMenu.classList.remove('active');
                     const icon = mobileMenuToggle.querySelector('i');
@@ -729,75 +744,103 @@
                     icon.classList.add('fa-bars');
                 }
             });
-            
+        
             // Close menu when clicking a link
-            const menuLinks = document.querySelectorAll('.menu-link');
-            menuLinks.forEach(link => {
-                link.addEventListener('click', function() {
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.addEventListener('click', function () {
                     mainMenu.classList.remove('active');
                     const icon = mobileMenuToggle.querySelector('i');
                     icon.classList.remove('fa-times');
                     icon.classList.add('fa-bars');
                 });
             });
-            
-            // Form validation
+        
+            /* =========================================================
+               DATE HANDLING (FIXED — NO TIMEZONE BUG)
+            ========================================================= */
+            const dateField = document.getElementById('id_date');
+        
+            // Create today's date in YYYY-MM-DD format
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+        
+            // Set default date and prevent future dates
+            if (dateField) {
+                dateField.value = todayStr;
+                dateField.max = todayStr;
+            }
+        
+            /* =========================================================
+               FORM VALIDATION
+            ========================================================= */
             const form = document.getElementById('addExpenseForm');
+        
             form.addEventListener('submit', function (event) {
                 let isValid = true;
-                
-                // Clear previous invalid states
+        
+                // Remove previous invalid states
                 form.querySelectorAll('.form-control, .form-select').forEach(input => {
                     input.classList.remove('is-invalid');
                 });
-                
-                // Check required fields
+        
+                // Required fields
                 const requiredFields = [
-                    'id_title', 'id_category', 'id_date', 'id_amount', 'id_paid_to'
+                    'id_title',
+                    'id_category',
+                    'id_date',
+                    'id_amount',
+                    'id_paid_to'
                 ];
-                
+        
                 requiredFields.forEach(id => {
                     const field = document.getElementById(id);
-                    if (!field.value.trim()) {
+        
+                    if (!field || !field.value.trim()) {
                         field.classList.add('is-invalid');
                         isValid = false;
-                    } else if (id === 'id_amount' && parseFloat(field.value) <= 0) {
+                    }
+        
+                    // Amount must be positive
+                    if (id === 'id_amount' && parseFloat(field.value) <= 0) {
                         field.classList.add('is-invalid');
                         isValid = false;
                     }
                 });
-                
-                // Check date is not in future
-                const dateField = document.getElementById('id_date');
-                if (dateField.value) {
-                    const selectedDate = new Date(dateField.value);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    
-                    if (selectedDate > today) {
-                        dateField.classList.add('is-invalid');
-                        document.querySelector('#id_date ~ .invalid-feedback').textContent = 'Date cannot be in the future.';
-                        isValid = false;
-                    }
+        
+                // 🔒 FUTURE DATE CHECK (STRING COMPARISON – SAFE)
+                if (dateField && dateField.value > todayStr) {
+                    dateField.classList.add('is-invalid');
+                    document.querySelector('#id_date ~ .invalid-feedback').textContent =
+                        'Date cannot be in the future.';
+                    isValid = false;
                 }
-                
+        
+                // Stop form submission if invalid
                 if (!isValid) {
                     event.preventDefault();
                     event.stopPropagation();
-                    
+        
                     // Scroll to first invalid field
                     const firstInvalid = form.querySelector('.is-invalid');
                     if (firstInvalid) {
-                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstInvalid.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                         firstInvalid.focus();
                     }
                 }
             });
-            
-            // Real-time validation for amount field
+        
+            /* =========================================================
+               REAL-TIME AMOUNT VALIDATION
+            ========================================================= */
             const amountField = document.getElementById('id_amount');
             if (amountField) {
-                amountField.addEventListener('input', function() {
+                amountField.addEventListener('input', function () {
                     if (parseFloat(this.value) <= 0) {
                         this.classList.add('is-invalid');
                     } else {
@@ -805,30 +848,26 @@
                     }
                 });
             }
-            
-            // Set today's date as default for date field
-            const dateField = document.getElementById('id_date');
-            if (dateField && !dateField.value) {
-                const today = new Date().toISOString().split('T')[0];
-                dateField.value = today;
-                dateField.max = today; // Prevent future dates
-            }
-            
-            // Add card animation
+        
+            /* =========================================================
+               FORM CARD ENTRY ANIMATION
+            ========================================================= */
             const formCard = document.querySelector('.form-card');
             if (formCard) {
                 formCard.style.opacity = '0';
                 formCard.style.transform = 'translateY(20px)';
-                
+        
                 setTimeout(() => {
                     formCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                     formCard.style.opacity = '1';
                     formCard.style.transform = 'translateY(0)';
                 }, 100);
             }
-            
-            // Handle window resize
-            window.addEventListener('resize', function() {
+        
+            /* =========================================================
+               HANDLE WINDOW RESIZE (RESET MENU)
+            ========================================================= */
+            window.addEventListener('resize', function () {
                 if (window.innerWidth > 768) {
                     mainMenu.classList.remove('active');
                     const icon = mobileMenuToggle.querySelector('i');
@@ -836,7 +875,9 @@
                     icon.classList.add('fa-bars');
                 }
             });
+        
         });
-    </script>
+        </script>
+        
 </body>
 </html>

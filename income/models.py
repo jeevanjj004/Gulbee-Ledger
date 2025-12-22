@@ -3,10 +3,36 @@ from django.contrib.auth.models import User
 
 
 class CategoryChoice(models.TextChoices):
-    GIFT = "GIFT", "Gift"
+   
     SALARY = "SALARY", "Salary"
-    OTHERS = "OTHERS", "Others"
+    BONUS = "BONUS", "Bonus"
+    COMMISSION = "COMMISSION", "Commission"
+    FREELANCE = "FREELANCE", "Freelance / Contract"
 
+    BUSINESS = "BUSINESS", "Business Income"
+    CONSULTING = "CONSULTING", "Consulting"
+    PROFIT = "PROFIT", "Business Profit"
+
+    INTEREST = "INTEREST", "Interest"
+    RENTAL = "RENTAL", "Rental Income"
+    CAPITAL_GAIN = "CAPITAL_GAIN", "Capital Gain"
+
+    GIFT = "GIFT", "Gift"
+    DONATION = "DONATION", "Donation Received"
+    REFUND = "REFUND", "Refund"
+    CASHBACK = "CASHBACK", "Cashback"
+    PRIZE = "PRIZE", "Prize / Lottery"
+
+    PENSION = "PENSION", "Pension"
+    SUBSIDY = "SUBSIDY", "Government Subsidy"
+    SCHOLARSHIP = "SCHOLARSHIP", "Scholarship"
+
+    YOUTUBE = "YOUTUBE", "YouTube Income"
+    BLOG = "BLOG", "Blog / Content"
+    ONLINE_SALES = "ONLINE_SALES", "Online Sales"
+
+
+    OTHERS = "OTHERS", "Others"
 
 class Income(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE)

@@ -4,6 +4,7 @@ from .forms import incomeForm,updateIncomeForm
 from datetime import datetime
 import random
 from django.db.models import Sum,Q
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -88,7 +89,7 @@ def view_all_income(request):
 
 
 
-
+@login_required
 def add_income(request):
     form=incomeForm(request.POST or None)
     if request.method=="POST":
@@ -117,6 +118,8 @@ def auto_income_id():
         # Check if this ID already exists
         if not Income.objects.filter(income_id=income_id).exists():
             return income_id
+        
+@login_required
 def delete_income(request,pk):
     income=get_object_or_404(Income,income_id=pk)
     if request.method=="POST":
@@ -125,7 +128,7 @@ def delete_income(request,pk):
     return render(request, "confirm_delete.html", {"income": income})
 
 
-
+@login_required
 def income_update(request, pk):
     # Get the Income object from DB
     inc = get_object_or_404(Income, income_id=pk)

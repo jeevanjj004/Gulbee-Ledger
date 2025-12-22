@@ -18,7 +18,7 @@ class EMI(models.Model):
     sequence_number = models.IntegerField()   # 1, 2, 3....
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-
+    
     due_date = models.DateField()
     
     paid_date = models.DateField(null=True, blank=True)
@@ -34,9 +34,14 @@ class EMI(models.Model):
         blank=True,
         null=True
     )
+# New fields to track if reminder sent
+    reminder_5_days_sent = models.BooleanField(default=False)
+    reminder_due_day_sent = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
+   
     def __str__(self):
         return f"{self.emi_id} - {self.debit.debit_id}"

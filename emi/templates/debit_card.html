@@ -133,16 +133,22 @@
             border-radius: 2px;
         }
         
-       
+        
         
         /* ================= PAGE CONTENT ================= */
         .page-container {
             padding: 2rem;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
         .page-header {
             margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         
         .page-title {
@@ -160,6 +166,28 @@
         
         .page-title i {
             color: var(--primary);
+        }
+        
+        .back-btn {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .back-btn:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+            color: var(--text-light);
+            text-decoration: none;
         }
         
         /* ================= STATUS FILTER ================= */
@@ -193,14 +221,6 @@
         
         .status-filter-btn.active {
             color: white;
-        }
-        
-        .status-filter-btn.all {
-            border-color: var(--primary);
-        }
-        
-        .status-filter-btn.all.active {
-            background: var(--primary);
         }
         
         .status-filter-btn.overdue {
@@ -242,13 +262,6 @@
             box-shadow: 0 8px 16px var(--shadow);
             overflow: hidden;
             transition: var(--transition);
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .debit-card.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
         
         .debit-card:hover {
@@ -307,6 +320,12 @@
             letter-spacing: 0.5px;
             background: rgba(255, 255, 255, 0.2);
             color: white;
+        }
+        
+        .debit-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
         
         .debit-info-bar {
@@ -553,30 +572,6 @@
             font-style: italic;
         }
         
-        /* Back Button */
-        .back-btn {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius);
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            margin-bottom: 2rem;
-        }
-        
-        .back-btn:hover {
-            background: rgba(30, 41, 59, 0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px var(--shadow);
-            color: var(--text-light);
-            text-decoration: none;
-        }
-        
         /* ================= EMPTY STATE ================= */
         .empty-state {
             text-align: center;
@@ -684,9 +679,20 @@
                 padding: 1rem;
             }
             
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
             .page-title {
                 font-size: 1.5rem;
+                justify-content: center;
                 text-align: center;
+            }
+            
+            .back-btn {
+                width: 100%;
                 justify-content: center;
             }
             
@@ -709,6 +715,10 @@
             
             .debit-header-title {
                 font-size: 1.1rem;
+            }
+            
+            .debit-actions {
+                justify-content: center;
             }
             
             .debit-info-bar {
@@ -753,12 +763,6 @@
             .action-btn {
                 padding: 0.4rem 0.75rem;
                 font-size: 0.8rem;
-            }
-            
-            .back-btn {
-                width: 100%;
-                justify-content: center;
-                margin-bottom: 1rem;
             }
         }
         
@@ -872,6 +876,18 @@
                 padding: 0.5rem;
             }
         }
+        
+        /* High resolution screens */
+        @media (min-width: 1440px) {
+            .page-container {
+                padding: 3rem;
+                max-width: 1600px;
+            }
+            
+            .debit-info-bar {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
     </style>
 </head>
 
@@ -941,20 +957,17 @@
         <div class="page-header">
             <h1 class="page-title">
                 <i class="fas fa-credit-card"></i>
-                <br>
                 All EMI Installments
             </h1>
+            <a href="{% url 'home' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
         </div>
-
-        <!-- Back Button -->
-        <a href="{% url 'home' %}" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            Back to Dashboard
-        </a>
 
         <!-- Status Filter -->
         <div class="status-filter" id="statusFilter">
-            <button class="status-filter-btn all active" data-status="all">
+            <button class="status-filter-btn overdue active" data-status="all">
                 <i class="fas fa-filter"></i>
                 All
             </button>
@@ -973,254 +986,230 @@
         </div>
 
         <!-- Debit Cards with EMIs -->
-                <!-- Debit Cards with EMIs -->
-                {% if debit_groups %}
-                <div class="debit-cards-container" id="debitCardsContainer">
-                    {% for group in debit_groups %}
-                        {% with debit=group.debit overdue_count=group.overdue_count pending_count=group.pending_count paid_count=group.paid_count debit_status=group.status %}
-                            <div class="debit-card" data-debit-id="{{ debit.debit_id }}" 
-                                 data-debit-status="{{ debit_status }}"
-                                 data-overdue-count="{{ overdue_count }}"
-                                 data-pending-count="{{ pending_count }}"
-                                 data-paid-count="{{ paid_count }}">
-                                
-                                {% if debit_status == "overdue" %}
-                                    <div class="debit-header overdue">
-                                        <div class="debit-header-title">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                            {{ debit.lender_name }}
-                                        </div>
-                                        <div class="debit-status-badge">
+        {% if emis %}
+            <div class="debit-cards-container">
+                {% regroup emis by debit as debit_list %}
+                
+                {# First, sort debits by their highest priority status #}
+                {% for debit_group in debit_list %}
+                    {# Calculate status counts for this debit #}
+                    {% with overdue_count=0 pending_count=0 paid_count=0 %}
+                        {% for emi in debit_group.list %}
+                            {% if emi.status == 'OVERDUE' %}
+                                {% widthratio overdue_count|add:1 1 1 as overdue_count %}
+                            {% elif emi.status == 'PAID' %}
+                                {% widthratio paid_count|add:1 1 1 as paid_count %}
+                            {% else %}
+                                {% widthratio pending_count|add:1 1 1 as pending_count %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {# Determine debit status based on priority: Overdue > Pending > Paid #}
+                        {% if overdue_count > 0 %}
+                            <div class="debit-card" data-debit-status="overdue" data-debit-id="{{ debit_group.grouper.debit_id }}">
+                                <!-- Debit Header with Status -->
+                                <div class="debit-header overdue">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-actions">
+                                        <span class="debit-status-badge">
                                             OVERDUE
-                                        </div>
+                                        </span>
                                     </div>
-                                {% elif debit_status == "pending" %}
-                                    <div class="debit-header pending">
-                                        <div class="debit-header-title">
-                                            <i class="fas fa-clock"></i>
-                                            {{ debit.lender_name }}
-                                        </div>
-                                        <div class="debit-status-badge">
+                                </div>
+                        {% elif pending_count > 0 %}
+                            <div class="debit-card" data-debit-status="pending" data-debit-id="{{ debit_group.grouper.debit_id }}">
+                                <!-- Debit Header with Status -->
+                                <div class="debit-header pending">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-clock"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-actions">
+                                        <span class="debit-status-badge">
                                             PENDING
-                                        </div>
+                                        </span>
                                     </div>
-                                {% else %}
-                                    <div class="debit-header paid">
-                                        <div class="debit-header-title">
-                                            <i class="fas fa-check-circle"></i>
-                                            {{ debit.lender_name }}
-                                        </div>
-                                        <div class="debit-status-badge">
+                                </div>
+                        {% else %}
+                            <div class="debit-card" data-debit-status="paid" data-debit-id="{{ debit_group.grouper.debit_id }}">
+                                <!-- Debit Header with Status -->
+                                <div class="debit-header paid">
+                                    <div class="debit-header-title">
+                                        <i class="fas fa-check-circle"></i>
+                                        {{ debit_group.grouper.lender_name }}
+                                    </div>
+                                    <div class="debit-actions">
+                                        <span class="debit-status-badge">
                                             PAID
-                                        </div>
-                                    </div>
-                                {% endif %}
-    
-                                <!-- EMI Summary -->
-                                <div class="emi-summary">
-                                    <div class="summary-item">
-                                        <div class="summary-count overdue-count">{{ overdue_count }}</div>
-                                        <span class="summary-label">Overdue</span>
-                                    </div>
-                                    <div class="summary-item">
-                                        <div class="summary-count pending-count">{{ pending_count }}</div>
-                                        <span class="summary-label">Pending</span>
-                                    </div>
-                                    <div class="summary-item">
-                                        <div class="summary-count paid-count">{{ paid_count }}</div>
-                                        <span class="summary-label">Paid</span>
-                                    </div>
-                                </div>
-    
-                                <!-- Debit Info -->
-                                <div class="debit-info-bar">
-                                    <div class="debit-info-item">
-                                        <span class="info-label">Loan Amount</span>
-                                        <span class="info-value amount">
-                                            <i class="fas fa-indian-rupee-sign"></i>
-                                            {{ debit.amount }}
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="debit-info-item">
-                                        <span class="info-label">EMI Type</span>
-                                        <span class="info-value">
-                                            <i class="fas fa-calendar-alt"></i>
-                                            {{ debit.get_emi_type_display|default:"-" }}
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="debit-info-item">
-                                        <span class="info-label">Start Date</span>
-                                        <span class="info-value">
-                                            <i class="fas fa-play-circle"></i>
-                                            {{ debit.start_date|date:"d M Y" }}
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="debit-info-item">
-                                        <span class="info-label">Maturity Date</span>
-                                        <span class="info-value">
-                                            <i class="fas fa-flag-checkered"></i>
-                                            {{ debit.maturity_date|date:"d M Y"|default:"-" }}
                                         </span>
                                     </div>
                                 </div>
-    
-                                <!-- EMI Table -->
-                                <div class="emi-table-container">
-                                    <table class="emi-table">
-                                        <thead>
-                                            <tr>
-                                                <th data-label="Seq No.">Seq No.</th>
-                                                <th data-label="Amount">Amount</th>
-                                                <th data-label="Due Date">Due Date</th>
-                                                <th data-label="Paid Date">Paid Date</th>
-                                                <th data-label="Status">Status</th>
-                                                <th data-label="Bill">Bill</th>
-                                                <th data-label="Action">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for emi in group.emis %}
-                                                {% if emi.status == "OVERDUE" %}
-                                                    <tr class="emi-row" data-emi-status="overdue">
-                                                        <td data-label="Seq No." class="sequence-cell">
-                                                            #{{ emi.sequence_number }}
-                                                        </td>
-                                                        <td data-label="Amount" class="amount-cell">
-                                                            ₹{{ emi.amount }}
-                                                        </td>
-                                                        <td data-label="Due Date" class="date-cell date-overdue">
-                                                            <i class="fas fa-exclamation-circle"></i> {{ emi.due_date|date:"d M Y" }}
-                                                        </td>
-                                                        <td data-label="Paid Date" class="date-cell date-empty">
-                                                            -
-                                                        </td>
-                                                        <td data-label="Status">
-                                                            <span class="status-badge status-overdue">
-                                                                <i class="fas fa-exclamation-triangle"></i> Overdue
-                                                            </span>
-                                                        </td>
-                                                        <td data-label="Bill">
-                                                            {% if emi.bill_photo %}
-                                                                <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
-                                                                    <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
-                                                                </a>
-                                                            {% else %}
-                                                                <span class="bill-empty">No bill</span>
-                                                            {% endif %}
-                                                        </td>
-                                                        <td data-label="Action">
-                                                            <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
-                                                                <i class="fas fa-money-bill-wave"></i>
-                                                                Pay
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                {% endif %}
-                                            {% endfor %}
-                                            
-                                            {% for emi in group.emis %}
-                                                {% if emi.status == "PENDING" %}
-                                                    <tr class="emi-row" data-emi-status="pending">
-                                                        <td data-label="Seq No." class="sequence-cell">
-                                                            #{{ emi.sequence_number }}
-                                                        </td>
-                                                        <td data-label="Amount" class="amount-cell">
-                                                            ₹{{ emi.amount }}
-                                                        </td>
-                                                        <td data-label="Due Date" class="date-cell date-due">
-                                                            <i class="fas fa-calendar-day"></i> {{ emi.due_date|date:"d M Y" }}
-                                                        </td>
-                                                        <td data-label="Paid Date" class="date-cell date-empty">
-                                                            -
-                                                        </td>
-                                                        <td data-label="Status">
-                                                            <span class="status-badge status-pending">
-                                                                <i class="fas fa-clock"></i> Pending
-                                                            </span>
-                                                        </td>
-                                                        <td data-label="Bill">
-                                                            {% if emi.bill_photo %}
-                                                                <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
-                                                                    <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
-                                                                </a>
-                                                            {% else %}
-                                                                <span class="bill-empty">No bill</span>
-                                                            {% endif %}
-                                                        </td>
-                                                        <td data-label="Action">
-                                                            <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
-                                                                <i class="fas fa-money-bill-wave"></i>
-                                                                Pay
-                                                            </a>
-                                                        </td>
-                                                    </tr>
-                                                {% endif %}
-                                            {% endfor %}
-                                            
-                                            {% for emi in group.emis %}
-                                                {% if emi.status == "PAID" %}
-                                                    <tr class="emi-row" data-emi-status="paid">
-                                                        <td data-label="Seq No." class="sequence-cell">
-                                                            #{{ emi.sequence_number }}
-                                                        </td>
-                                                        <td data-label="Amount" class="amount-cell">
-                                                            ₹{{ emi.amount }}
-                                                        </td>
-                                                        <td data-label="Due Date" class="date-cell date-due">
-                                                            <i class="fas fa-calendar-day"></i> {{ emi.due_date|date:"d M Y" }}
-                                                        </td>
-                                                        <td data-label="Paid Date" class="date-cell date-paid">
-                                                            <i class="fas fa-calendar-check"></i> {{ emi.paid_date|date:"d M Y" }}
-                                                        </td>
-                                                        <td data-label="Status">
-                                                            <span class="status-badge status-paid">
-                                                                <i class="fas fa-check-circle"></i> Paid
-                                                            </span>
-                                                        </td>
-                                                        <td data-label="Bill">
-                                                            {% if emi.bill_photo %}
-                                                                <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
-                                                                    <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
-                                                                </a>
-                                                            {% else %}
-                                                                <span class="bill-empty">No bill</span>
-                                                            {% endif %}
-                                                        </td>
-                                                        <td data-label="Action">
-                                                            <span class="action-btn btn-paid">
-                                                                <i class="fas fa-check-circle"></i>
-                                                                Paid
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
+                        {% endif %}
+
+                        <!-- EMI Summary -->
+                        <div class="emi-summary">
+                            <div class="summary-item">
+                                <div class="summary-count overdue-count">{{ overdue_count }}</div>
+                                <span class="summary-label">Overdue</span>
                             </div>
-                        {% endwith %}
-                    {% endfor %}
-                </div>
-            {% else %}
-                <!-- Empty State -->
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fas fa-credit-card"></i>
+                            <div class="summary-item">
+                                <div class="summary-count pending-count">{{ pending_count }}</div>
+                                <span class="summary-label">Pending</span>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-count paid-count">{{ paid_count }}</div>
+                                <span class="summary-label">Paid</span>
+                            </div>
+                        </div>
+
+                        <!-- Debit Info -->
+                        <div class="debit-info-bar">
+                            <div class="debit-info-item">
+                                <span class="info-label">Loan Amount</span>
+                                <span class="info-value amount">
+                                    <i class="fas fa-indian-rupee-sign"></i>
+                                    {{ debit_group.grouper.amount }}
+                                </span>
+                            </div>
+                            
+                            <div class="debit-info-item">
+                                <span class="info-label">EMI Type</span>
+                                <span class="info-value">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ debit_group.grouper.get_emi_type_display|default:"-" }}
+                                </span>
+                            </div>
+                            
+                            <div class="debit-info-item">
+                                <span class="info-label">Start Date</span>
+                                <span class="info-value">
+                                    <i class="fas fa-play-circle"></i>
+                                    {{ debit_group.grouper.start_date|date:"d M Y" }}
+                                </span>
+                            </div>
+                            
+                            <div class="debit-info-item">
+                                <span class="info-label">Maturity Date</span>
+                                <span class="info-value">
+                                    <i class="fas fa-flag-checkered"></i>
+                                    {{ debit_group.grouper.maturity_date|default:"-"|date:"d M Y" }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- EMI Table -->
+                        <div class="emi-table-container">
+                            <table class="emi-table">
+                                <thead>
+                                    <tr>
+                                        <th data-label="Seq No.">Seq No.</th>
+                                        <th data-label="Amount">Amount</th>
+                                        <th data-label="Due Date">Due Date</th>
+                                        <th data-label="Paid Date">Paid Date</th>
+                                        <th data-label="Status">Status</th>
+                                        <th data-label="Bill">Bill</th>
+                                        <th data-label="Action">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {# Sort EMIs within debit: Overdue > Pending > Paid #}
+                                    {% for emi in debit_group.list %}
+                                        {% if emi.status == 'OVERDUE' %}
+                                            {% with emi_priority=1 %}
+                                                <tr class="emi-row" data-emi-status="{{ emi.status|lower }}">
+                                        {% elif emi.status == 'PAID' %}
+                                            {% with emi_priority=3 %}
+                                                <tr class="emi-row" data-emi-status="{{ emi.status|lower }}">
+                                        {% else %}
+                                            {% with emi_priority=2 %}
+                                                <tr class="emi-row" data-emi-status="{{ emi.status|lower }}">
+                                        {% endif %}
+                                        
+                                        <td data-label="Seq No." class="sequence-cell">
+                                            #{{ emi.sequence_number }}
+                                        </td>
+                                        <td data-label="Amount" class="amount-cell">
+                                            ₹{{ emi.amount }}
+                                        </td>
+                                        
+                                        {% if emi.status == 'OVERDUE' and emi.due_date|date:"U" < now|date:"U" %}
+                                            <td data-label="Due Date" class="date-cell date-overdue">
+                                                <i class="fas fa-exclamation-circle"></i> {{ emi.due_date|date:"d M Y" }}
+                                            </td>
+                                        {% else %}
+                                            <td data-label="Due Date" class="date-cell date-due">
+                                                <i class="fas fa-calendar-day"></i> {{ emi.due_date|date:"d M Y" }}
+                                            </td>
+                                        {% endif %}
+                                        
+                                        <td data-label="Paid Date" class="date-cell {% if emi.paid_date %}date-paid{% else %}date-empty{% endif %}">
+                                            {% if emi.paid_date %}
+                                                <i class="fas fa-calendar-check"></i> {{ emi.paid_date|date:"d M Y" }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Status">
+                                            <span class="status-badge status-{{ emi.status|lower }}">
+                                                {% if emi.status == 'PAID' %}
+                                                    <i class="fas fa-check-circle"></i> Paid
+                                                {% elif emi.status == 'OVERDUE' %}
+                                                    <i class="fas fa-exclamation-triangle"></i> Overdue
+                                                {% else %}
+                                                    <i class="fas fa-clock"></i> Pending
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td data-label="Bill">
+                                            {% if emi.bill_photo %}
+                                                <a href="{{ emi.bill_photo.url }}" target="_blank" class="bill-link">
+                                                    <img src="{{ emi.bill_photo.url }}" class="bill-thumb" alt="Bill Photo">
+                                                </a>
+                                            {% else %}
+                                                <span class="bill-empty">No bill</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Action">
+                                            {% if emi.status != 'PAID' %}
+                                                <a href="{% url 'pay_emi' emi.emi_id %}" class="action-btn btn-pay">
+                                                    <i class="fas fa-money-bill-wave"></i>
+                                                    Pay
+                                                </a>
+                                            {% else %}
+                                                <span class="action-btn btn-paid">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    Paid
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <h3 class="empty-state-title">No EMIs Found</h3>
-                    <p class="empty-state-text">
-                        You don't have any EMI installments yet. Start by adding a debit with EMI schedule.
-                    </p>
-                    <a href="{% url 'view_all' %}" class="back-btn" style="margin-top: 1.5rem;">
-                        <i class="fas fa-plus-circle"></i>
-                        Add New Debit
-                    </a>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-credit-card"></i>
                 </div>
-            {% endif %}
+                <h3 class="empty-state-title">No EMIs Found</h3>
+                <p class="empty-state-text">
+                    You don't have any EMI installments yet. Start by adding a debit with EMI schedule.
+                </p>
+                <a href="{% url 'view_all' %}" class="back-btn" style="margin-top: 1.5rem;">
+                    <i class="fas fa-plus-circle"></i>
+                    Add New Debit
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <!-- JavaScript -->
@@ -1230,7 +1219,7 @@
             const mainMenu = document.getElementById('mainMenu');
             const statusFilter = document.getElementById('statusFilter');
             const statusFilterBtns = document.querySelectorAll('.status-filter-btn');
-            const debitCardsContainer = document.getElementById('debitCardsContainer');
+            const debitCards = document.querySelectorAll('.debit-card');
             
             // Toggle mobile menu
             mobileMenuToggle.addEventListener('click', function() {
@@ -1266,9 +1255,6 @@
                 });
             });
             
-            // Initialize cards with animation
-            initializeCards();
-            
             // Status Filter Functionality
             statusFilterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1279,9 +1265,34 @@
                     this.classList.add('active');
                     
                     // Filter debit cards
-                    filterDebitCards(status);
+                    debitCards.forEach(card => {
+                        const cardStatus = card.getAttribute('data-debit-status');
+                        
+                        if (status === 'all') {
+                            card.style.display = 'block';
+                        } else if (cardStatus === status) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                        
+                        // Add animation
+                        if (card.style.display === 'block') {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(20px)';
+                            
+                            setTimeout(() => {
+                                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, 50);
+                        }
+                    });
                 });
             });
+            
+            // Highlight overdue EMIs and debits
+            highlightOverdueEmis();
             
             // Add table row animations
             const tableRows = document.querySelectorAll('.emi-table tbody tr');
@@ -1328,138 +1339,9 @@
                 }
             });
             
-            function initializeCards() {
-                const cards = document.querySelectorAll('.debit-card');
-                
-                // Sort cards by status priority
-                sortDebitCards();
-                
-                // Animate cards in
-                setTimeout(() => {
-                    cards.forEach((card, index) => {
-                        setTimeout(() => {
-                            card.classList.add('visible');
-                        }, index * 100);
-                    });
-                }, 100);
-            }
-            
-            function sortDebitCards() {
-                const container = document.querySelector('.debit-cards-container');
-                if (!container) return;
-                
-                const cards = Array.from(container.querySelectorAll('.debit-card'));
-                
-                // Sort cards by status priority: overdue > pending > paid
-                cards.sort((a, b) => {
-                    const statusA = a.getAttribute('data-debit-status');
-                    const statusB = b.getAttribute('data-debit-status');
-                    
-                    // Status priority mapping
-                    const statusPriority = {
-                        'overdue': 1,
-                        'pending': 2,
-                        'paid': 3
-                    };
-                    
-                    const priorityA = statusPriority[statusA] || 4;
-                    const priorityB = statusPriority[statusB] || 4;
-                    
-                    if (priorityA !== priorityB) {
-                        return priorityA - priorityB;
-                    }
-                    
-                    // If same status, sort by count of that status
-                    if (statusA === 'overdue') {
-                        const countA = parseInt(a.getAttribute('data-overdue-count')) || 0;
-                        const countB = parseInt(b.getAttribute('data-overdue-count')) || 0;
-                        return countB - countA;
-                    } else if (statusA === 'pending') {
-                        const countA = parseInt(a.getAttribute('data-pending-count')) || 0;
-                        const countB = parseInt(b.getAttribute('data-pending-count')) || 0;
-                        return countB - countA;
-                    } else {
-                        const countA = parseInt(a.getAttribute('data-paid-count')) || 0;
-                        const countB = parseInt(b.getAttribute('data-paid-count')) || 0;
-                        return countB - countA;
-                    }
-                });
-                
-                // Reorder cards in container
-                cards.forEach(card => {
-                    container.appendChild(card);
-                });
-            }
-            
-            function filterDebitCards(status) {
-                const debitCards = document.querySelectorAll('.debit-card');
-                let visibleCards = 0;
-                
-                debitCards.forEach((card, index) => {
-                    const cardStatus = card.getAttribute('data-debit-status');
-                    const cardEmiRows = card.querySelectorAll('.emi-row');
-                    
-                    // Filter based on status
-                    if (status === 'all' || cardStatus === status) {
-                        card.style.display = 'block';
-                        
-                        // Show all EMI rows
-                        cardEmiRows.forEach(row => {
-                            row.style.display = '';
-                        });
-                        
-                        // Animate card in
-                        setTimeout(() => {
-                            card.classList.add('visible');
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0)';
-                        }, visibleCards * 50);
-                        
-                        visibleCards++;
-                    } else {
-                        card.style.display = 'none';
-                        card.classList.remove('visible');
-                    }
-                });
-                
-                // If no cards visible, show empty state
-                if (visibleCards === 0 && debitCards.length > 0) {
-                    showEmptyState(status);
-                }
-            }
-            
-            function showEmptyState(status) {
-                const container = document.querySelector('.debit-cards-container');
-                if (!container) return;
-                
-                // Remove any existing empty state
-                const existingEmptyState = container.querySelector('.filter-empty-state');
-                if (existingEmptyState) {
-                    existingEmptyState.remove();
-                }
-                
-                // Create empty state
-                const emptyState = document.createElement('div');
-                emptyState.className = 'empty-state filter-empty-state';
-                emptyState.innerHTML = `
-                    <div class="empty-state-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <h3 class="empty-state-title">No ${status} EMIs Found</h3>
-                    <p class="empty-state-text">
-                        You don't have any ${status} EMI installments at the moment.
-                    </p>
-                `;
-                
-                container.appendChild(emptyState);
-            }
-            
-            // Check for overdue EMIs
-            checkOverdueEmis();
-            
-            function checkOverdueEmis() {
+            function highlightOverdueEmis() {
                 const today = new Date();
-                const dueDateCells = document.querySelectorAll('.date-cell:not(.date-paid):not(.date-empty)');
+                const dueDateCells = document.querySelectorAll('.date-due, .date-overdue');
                 
                 dueDateCells.forEach(cell => {
                     const dateText = cell.textContent.trim();
@@ -1477,66 +1359,129 @@
                         if (monthIndex !== -1) {
                             const dueDate = new Date(year, monthIndex, day);
                             
-                            // Check if overdue and not paid
-                            if (dueDate < today) {
-                                const row = cell.closest('tr');
-                                const statusBadge = row.querySelector('.status-badge');
-                                
-                                if (statusBadge && !statusBadge.classList.contains('status-paid') && !statusBadge.classList.contains('status-overdue')) {
-                                    // Update status to overdue
+                            // Highlight if overdue and not paid
+                            const row = cell.closest('tr');
+                            const statusBadge = row.querySelector('.status-badge');
+                            
+                            if (dueDate < today && statusBadge && !statusBadge.classList.contains('status-paid')) {
+                                if (!statusBadge.classList.contains('status-overdue')) {
                                     statusBadge.className = 'status-badge status-overdue';
                                     statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Overdue';
+                                }
+                                
+                                // Update debit status if needed
+                                const debitCard = row.closest('.debit-card');
+                                const debitStatus = debitCard.getAttribute('data-debit-status');
+                                if (debitStatus !== 'overdue') {
+                                    debitCard.setAttribute('data-debit-status', 'overdue');
+                                    const debitHeader = debitCard.querySelector('.debit-header');
+                                    debitHeader.className = 'debit-header overdue';
                                     
-                                    // Update cell styling
-                                    cell.classList.remove('date-due');
-                                    cell.classList.add('date-overdue');
-                                    cell.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${dateText}`;
+                                    const debitTitleIcon = debitCard.querySelector('.debit-header-title i');
+                                    debitTitleIcon.className = 'fas fa-exclamation-triangle';
                                     
-                                    // Update debit card status
-                                    const debitCard = row.closest('.debit-card');
-                                    if (debitCard) {
-                                        // Update counts
-                                        const overdueCount = parseInt(debitCard.getAttribute('data-overdue-count')) || 0;
-                                        const pendingCount = parseInt(debitCard.getAttribute('data-pending-count')) || 0;
-                                        
-                                        debitCard.setAttribute('data-overdue-count', overdueCount + 1);
-                                        debitCard.setAttribute('data-pending-count', Math.max(0, pendingCount - 1));
-                                        
-                                        // Update summary display
-                                        const summaryOverdue = debitCard.querySelector('.overdue-count');
-                                        const summaryPending = debitCard.querySelector('.pending-count');
-                                        if (summaryOverdue) summaryOverdue.textContent = overdueCount + 1;
-                                        if (summaryPending) summaryPending.textContent = Math.max(0, pendingCount - 1);
-                                        
-                                        // Update debit status
-                                        if (overdueCount + 1 > 0) {
-                                            debitCard.setAttribute('data-debit-status', 'overdue');
-                                            
-                                            // Update header
-                                            const header = debitCard.querySelector('.debit-header');
-                                            const headerTitle = debitCard.querySelector('.debit-header-title');
-                                            const statusBadge = debitCard.querySelector('.debit-status-badge');
-                                            
-                                            if (header && headerTitle && statusBadge) {
-                                                header.className = 'debit-header overdue';
-                                                headerTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + headerTitle.textContent.replace(/^.*?\s/, '');
-                                                statusBadge.textContent = 'OVERDUE';
-                                            }
-                                            
-                                            // Re-sort cards
-                                            sortDebitCards();
-                                        }
-                                    }
+                                    const statusBadge = debitCard.querySelector('.debit-status-badge');
+                                    statusBadge.textContent = 'OVERDUE';
+                                    
+                                    // Move debit to top of container
+                                    const container = debitCard.parentElement;
+                                    container.prepend(debitCard);
                                 }
                             }
                         }
                     }
                 });
+                
+                // Sort debits by status: overdue > pending > paid
+                sortDebitCards();
             }
             
-            // Add blink animation for overdue dates
-            const blinkStyle = document.createElement('style');
-            blinkStyle.textContent = `
+            function sortDebitCards() {
+                const container = document.querySelector('.debit-cards-container');
+                const cards = Array.from(container.querySelectorAll('.debit-card'));
+                
+                // Define status priority
+                const statusPriority = {
+                    'overdue': 1,
+                    'pending': 2,
+                    'paid': 3
+                };
+                
+                // Sort cards by status priority
+                cards.sort((a, b) => {
+                    const statusA = a.getAttribute('data-debit-status');
+                    const statusB = b.getAttribute('data-debit-status');
+                    return statusPriority[statusA] - statusPriority[statusB];
+                });
+                
+                // Reorder cards in container
+                cards.forEach(card => {
+                    container.appendChild(card);
+                });
+            }
+            
+            // Initial sort
+            sortDebitCards();
+            
+            // Add expand/collapse functionality for debit cards
+            const debitHeaders = document.querySelectorAll('.debit-header');
+            debitHeaders.forEach(header => {
+                header.addEventListener('click', function(e) {
+                    // Don't trigger if clicking on filter button
+                    if (e.target.closest('.status-filter-btn') || e.target.closest('.action-btn')) {
+                        return;
+                    }
+                    
+                    if (window.innerWidth <= 768) {
+                        const card = this.closest('.debit-card');
+                        const tableContainer = card.querySelector('.emi-table-container');
+                        
+                        tableContainer.classList.toggle('expanded');
+                        card.classList.toggle('expanded');
+                        
+                        // Toggle icon rotation
+                        const icon = this.querySelector('.debit-header-title i');
+                        const originalIcon = icon.className.includes('fa-exclamation-triangle') ? 'fa-exclamation-triangle' : 
+                                           icon.className.includes('fa-clock') ? 'fa-clock' : 'fa-check-circle';
+                        
+                        if (tableContainer.classList.contains('expanded')) {
+                            icon.className = 'fas fa-chevron-up';
+                        } else {
+                            icon.className = `fas ${originalIcon}`;
+                        }
+                    }
+                });
+            });
+            
+            // Add CSS for expanded state
+            const style = document.createElement('style');
+            style.textContent = `
+                @media (max-width: 768px) {
+                    .emi-table-container:not(.expanded) {
+                        max-height: 0;
+                        overflow: hidden;
+                        transition: max-height 0.3s ease;
+                    }
+                    
+                    .emi-table-container.expanded {
+                        max-height: 2000px;
+                        transition: max-height 0.5s ease;
+                    }
+                    
+                    .debit-header {
+                        cursor: pointer;
+                    }
+                    
+                    .debit-header-title i {
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    .debit-card.expanded .debit-header-title i {
+                        transform: rotate(180deg);
+                    }
+                }
+                
+                /* Highlight overdue dates in table */
                 .date-overdue {
                     animation: blink 1.5s infinite;
                 }
@@ -1546,58 +1491,7 @@
                     50% { opacity: 0.7; }
                 }
             `;
-            document.head.appendChild(blinkStyle);
-            
-            // Add expand/collapse functionality for debit cards on mobile
-            if (window.innerWidth <= 768) {
-                const debitHeaders = document.querySelectorAll('.debit-header');
-                debitHeaders.forEach(header => {
-                    header.style.cursor = 'pointer';
-                    header.addEventListener('click', function(e) {
-                        if (e.target.closest('.debit-status-badge') || e.target.closest('i')) {
-                            return;
-                        }
-                        
-                        const card = this.closest('.debit-card');
-                        const tableContainer = card.querySelector('.emi-table-container');
-                        
-                        // Toggle expanded class
-                        card.classList.toggle('expanded');
-                        
-                        // Smooth height transition
-                        if (card.classList.contains('expanded')) {
-                            tableContainer.style.maxHeight = tableContainer.scrollHeight + 'px';
-                            tableContainer.style.overflow = 'visible';
-                        } else {
-                            tableContainer.style.maxHeight = '0';
-                            tableContainer.style.overflow = 'hidden';
-                        }
-                    });
-                });
-                
-                // Add CSS for smooth transitions
-                const style = document.createElement('style');
-                style.textContent = `
-                    .emi-table-container {
-                        max-height: 0;
-                        overflow: hidden;
-                        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-                    }
-                    
-                    .debit-card.expanded .emi-table-container {
-                        max-height: 2000px;
-                    }
-                    
-                    .debit-header {
-                        transition: background-color 0.3s ease;
-                    }
-                    
-                    .debit-header:active {
-                        opacity: 0.9;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
+            document.head.appendChild(style);
         });
     </script>
 </body>

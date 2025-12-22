@@ -8,7 +8,10 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Sum, Q
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
+@login_required
 def view_all_debit(request):
     debits = Debit.objects.filter(user=request.user)
 
@@ -63,139 +66,246 @@ def view_all_debit(request):
     return render(request, "view_all_debit.html", context)
 
 
+
+@login_required
 def create_debit(request):
+    """
+    Create a new debit record with optional EMI configuration.
+    Handles both regular debits and EMI-based debits.
+    """
     if request.method == "POST":
-
-        # BASIC
-        lender_name = request.POST.get("lender_name")
-        principal_amount = float(request.POST.get("principal_amount"))
-        start_date = datetime.strptime(
-            request.POST.get("start_date"), "%Y-%m-%d"
-        ).date()
-        notes = request.POST.get("notes")
-        user = request.user
-
-        is_emi = True if request.POST.get("is_emi") == "on" else False
-
-        # DEFAULTS
-        emi_type = EmiCategory.NO
-        installment_frequency = InstallmentCategory.WEEKLY
-        n_installments = 0
-        emi_interest_rate = 0.0
-        emi_amount = 0.0
-        if is_emi:
-            emi_type = request.POST.get("emi_type")
-            installment_frequency = request.POST.get("installment_frequency")
-            installments_str = request.POST.get("installments")
-
-            if not emi_type or emi_type == EmiCategory.NO:
-                messages.error(request, "Select a valid EMI type.")
-                return redirect("add_debit")
-
-            if not installment_frequency:
-                messages.error(request, "Select installment frequency.")
-                return redirect("add_debit")
-
-            if not installments_str or int(installments_str) <= 0:
-                messages.error(request, "Number of installments must be greater than 0.")
-                return redirect("add_debit")
-
-            n_installments = int(installments_str)
-
-            # CUSTOM EMI
-            if emi_type == EmiCategory.CUSTOM:
-                emi_amt_str = request.POST.get("emi_amt")
-                if not emi_amt_str or float(emi_amt_str) <= 0:
-                    messages.error(request, "Enter valid custom EMI amount.")
-                    return redirect("add_debit")
-
-                emi_amount = float(emi_amt_str)
-
-                # ✅ CUSTOM-ONLY VALIDATION
-                if principal_amount <= (n_installments * emi_amount):
-                    messages.error(
-                        request,
-                        "Principal amount must be greater than total EMI amount for Custom EMI."
+        try:
+            # ================= VALIDATE REQUIRED FIELDS =================
+            lender_name = request.POST.get("lender_name")
+            principal_amount_str = request.POST.get("principal_amount")
+            start_date_str = request.POST.get("start_date")
+            
+            # Validate required fields
+            if not lender_name or not principal_amount_str or not start_date_str:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "All required fields must be filled"
+                })
+            
+            # ================= PARSE AND VALIDATE DATA =================
+            principal_amount = float(principal_amount_str)
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            notes = request.POST.get("notes", "")
+            user = request.user
+            
+            # Validate principal amount
+            if principal_amount <= 0:
+                return JsonResponse({
+                    "status": "error",
+                    "message": "Principal amount must be greater than 0"
+                })
+            
+            # ================= EMI CONFIGURATION =================
+            is_emi = request.POST.get("is_emi") == "on"
+            
+            # Default values for non-EMI debits
+            emi_type = EmiCategory.NO
+            installment_frequency = InstallmentCategory.WEEKLY
+            n_installments = 0
+            emi_interest_rate = 0.0
+            emi_amount = 0.0
+            last_emi_amount = 0.0
+            
+            if is_emi:
+                # ================= VALIDATE EMI FIELDS =================
+                emi_type = request.POST.get("emi_type")
+                installment_frequency = request.POST.get("installment_frequency")
+                installments_str = request.POST.get("installments")
+                
+                # Validate EMI type selection
+                if not emi_type or emi_type == EmiCategory.NO:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Select a valid EMI type"
+                    })
+                
+                # Validate installment frequency
+                if not installment_frequency:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Select installment frequency"
+                    })
+                
+                # Validate number of installments
+                if not installments_str:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Enter number of installments"
+                    })
+                
+                n_installments = int(installments_str)
+                if n_installments <= 0:
+                    return JsonResponse({
+                        "status": "error",
+                        "message": "Number of installments must be greater than 0"
+                    })
+                
+                # ================= CUSTOM EMI CALCULATION =================
+                if emi_type == EmiCategory.CUSTOM:
+                    different_last = request.POST.get("different_last_installment") == "on"
+                    emi_amount_str = request.POST.get("emi_amt", "0")
+                    
+                    # Validate EMI amount
+                    if not emi_amount_str:
+                        return JsonResponse({
+                            "status": "error",
+                            "message": "Enter EMI amount for custom EMI"
+                        })
+                    
+                    emi_amount = float(emi_amount_str)
+                    if emi_amount <= 0:
+                        return JsonResponse({
+                            "status": "error",
+                            "message": "EMI amount must be greater than 0"
+                        })
+                    
+                    if different_last:
+                        # Validate last installment amount
+                        last_installment_amount_str = request.POST.get("last_installment_amount")
+                        if not last_installment_amount_str:
+                            return JsonResponse({
+                                "status": "error",
+                                "message": "Enter last installment amount"
+                            })
+                        
+                        last_emi_amount = float(last_installment_amount_str)
+                        if last_emi_amount <= 0:
+                            return JsonResponse({
+                                "status": "error",
+                                "message": "Last installment amount must be greater than 0"
+                            })
+                        
+                        # Calculate total: (n-1) regular installments + last installment
+                        regular_total = emi_amount * (n_installments - 1)
+                        total = regular_total + last_emi_amount
+                        
+                        # Validate total equals principal amount (allow 0.01 difference for rounding)
+                        if abs(total - principal_amount) > 0.01:
+                            return JsonResponse({
+                                "status": "error",
+                                "message": f"Total EMI amount (₹{total:.2f}) must equal principal amount (₹{principal_amount:.2f})"
+                            })
+                    else:
+                        # All installments are equal
+                        last_emi_amount = emi_amount
+                        total = emi_amount * n_installments
+                        
+                        # Validate total equals principal amount
+                        if abs(total - principal_amount) > 0.01:
+                            return JsonResponse({
+                                "status": "error",
+                                "message": f"Total EMI amount (₹{total:.2f}) must equal principal amount (₹{principal_amount:.2f})"
+                            })
+                
+                # ================= SHORT/LONG TERM EMI CALCULATION =================
+                else:
+                    # Validate interest rate for short/long term EMI
+                    interest_rate_str = request.POST.get("emi_interest_rate")
+                    if not interest_rate_str:
+                        return JsonResponse({
+                            "status": "error",
+                            "message": "Enter interest rate for EMI"
+                        })
+                    
+                    emi_interest_rate = float(interest_rate_str)
+                    if emi_interest_rate < 0:
+                        return JsonResponse({
+                            "status": "error",
+                            "message": "Interest rate cannot be negative"
+                        })
+                    
+                    # Calculate EMI amount using the emi_amount_fn function
+                    emi_amount = emi_amount_fn(
+                        emi_type,
+                        emi_interest_rate,
+                        principal_amount,
+                        n_installments
                     )
-                    return redirect("add_debit")
-
-            # SHORT / LONG TERM
-            else:
-                interest_str = request.POST.get("emi_interest_rate")
-                if not interest_str:
-                    messages.error(request, "Enter EMI interest rate.")
-                    return redirect("add_debit")
-
-                emi_interest_rate = float(interest_str)
-
-                emi_amount = emi_amount_fn(
-                    emi_type,
-                    emi_interest_rate,
-                    principal_amount,
-                    n_installments,
-                )
-
-        # COMMON SAVE
-        debit_id = debit_id_fn()
-        maturity_date = maturity_date_fn(
-            start_date, n_installments, installment_frequency
-        )
-
-        now = datetime.now()
-        status = "PENDING"
-
-        Debit.objects.create(
-            user=user,
-            debit_id=debit_id,
-            lender_name=lender_name,
-            amount=principal_amount,
-            interest_percent=emi_interest_rate,
-            start_date=start_date,
-            maturity_date=maturity_date,
-            is_emi=is_emi,
-            emi_type=emi_type,
-            emi_period=n_installments,
-            installment_type=installment_frequency,
-            emi_amount=emi_amount,
-            status=status,
-            notes=notes,
-            created_at=now,
-            updated_at=now,
-        )
-
-        # FIRST EMI
-        if is_emi:
-            if installment_frequency == InstallmentCategory.MONTHLY:
-                due_date = start_date + relativedelta(months=1)
-            else:
-                due_date = start_date + relativedelta(weeks=1)
-
-            EMI.objects.create(
-                user=user,
-                emi_id=emi_id_fn(),
-                debit_id=debit_id,
-                sequence_number=1,
-                amount=emi_amount,
-                due_date=due_date,
-                paid_date=None,
-                status="PENDING",
+                    last_emi_amount = emi_amount
+            
+            # ================= GENERATE DEBIT ID AND MATURITY DATE =================
+            debit_id = debit_id_fn()
+            maturity_date = maturity_date_fn(
+                start_date, n_installments, installment_frequency
             )
+            
+            # ================= CREATE DEBIT RECORD =================
+            debit = Debit.objects.create(
+                user=user,
+                debit_id=debit_id,
+                lender_name=lender_name,
+                amount=principal_amount,
+                interest_percent=emi_interest_rate,
+                start_date=start_date,
+                maturity_date=maturity_date,
+                is_emi=is_emi,
+                emi_type=emi_type,
+                emi_period=n_installments,
+                installment_type=installment_frequency,
+                emi_amount=emi_amount,
+                last_emi_amount=last_emi_amount,
+                status="PENDING",
+                notes=notes,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+            )
+            
+            # ================= CREATE FIRST EMI RECORD (if EMI-based) =================
+            if is_emi:
+                # Calculate first due date based on installment frequency
+                if installment_frequency == InstallmentCategory.MONTHLY:
+                    due_date = start_date + relativedelta(months=1)
+                else:
+                    due_date = start_date + relativedelta(weeks=1)
+                
+                EMI.objects.create(
+                    user=user,
+                    emi_id=emi_id_fn(),
+                    debit_id=debit_id,
+                    sequence_number=1,
+                    amount=emi_amount,
+                    due_date=due_date,
+                    status="PENDING",
+                )
+            
+            # ================= RETURN SUCCESS RESPONSE =================
+              
+# ================= RETURN SUCCESS RESPONSE =================
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({
+                    "status": "success",
+                    "message": "Debit created successfully",
+                    "redirect_url": reverse("view_all")
+                })
 
-        return render(
-    request,
-    "debit_success.html",
-    {
-        "redirect_url": reverse("view_all"),
-        "message": "Debit created successfully"
-    }
-)
-
-
+            # fallback for normal form submit
+            return redirect("view_all")          
+        except ValueError as e:
+            # Handle parsing errors (invalid numbers, dates, etc.)
+            return JsonResponse({
+                "status": "error",
+                "message": f"Invalid data format: {str(e)}"
+            })
+        except Exception as e:
+            # Handle any other unexpected errors
+            return JsonResponse({
+                "status": "error",
+                "message": f"An unexpected error occurred: {str(e)}"
+            })
+    
+    # ================= RENDER FORM FOR GET REQUESTS =================
     context = {
         "emi_types": EmiCategory.choices,
         "installment_types": InstallmentCategory.choices,
     }
     return render(request, "add_debit.html", context)
+
+
 
 def debit_id_fn():
     while True:
@@ -203,6 +313,7 @@ def debit_id_fn():
         id=f"DB{num}"
         if not Debit.objects.filter(debit_id=id).exists():
             return id
+        
 def emi_id_fn():
     while True:
         num = random.randint(10000, 99999)
@@ -239,7 +350,7 @@ def maturity_date_fn(start_date,n_installments,installment_frequency):
 #         total_payable_amount=principal_amount+interest
         
 #     return total_payable_amount
-
+@login_required
 def delete_debit(request,pk):
     debit=get_object_or_404(Debit,debit_id=pk)
     if request.method=="POST":
@@ -247,11 +358,12 @@ def delete_debit(request,pk):
         return redirect("view_all")
     return render(request, "debit_confirm_delete.html", {"debit": debit})
 
+
+@login_required
 def update_debit(request, pk):
     debit = get_object_or_404(Debit, debit_id=pk)
-    popup_message = None  # initialize variable
 
-    # Check first EMI
+    # Block edit if first EMI is paid
     first_emi = EMI.objects.filter(debit=debit, sequence_number=1).first()
     if first_emi and first_emi.status == "PAID":
         return render(request, "update_debit.html", {
@@ -261,71 +373,71 @@ def update_debit(request, pk):
 
     if request.method == "POST":
         lender_name = request.POST.get("lender_name")
-        principal_amount_str = request.POST.get("principal_amount")
-        start_date_str = request.POST.get("start_date")
-        notes = request.POST.get("notes")
-        is_emi = True if request.POST.get("is_emi") == "on" else False
+        principal_amount = float(request.POST.get("principal_amount", 0))
+        start_date = datetime.strptime(request.POST.get("start_date"), "%Y-%m-%d").date()
+        notes = request.POST.get("notes", "")
+        is_emi = request.POST.get("is_emi") == "on"
 
-        # --- VALIDATIONS ---
-        if not principal_amount_str or float(principal_amount_str) <= 0:
-            return render(request, "update_debit.html", {"debit": debit,
-                "popup_message": "Enter a valid principal amount."})
-        principal_amount = float(principal_amount_str)
+        if principal_amount <= 0:
+            return render(request, "update_debit.html", {
+                "debit": debit,
+                "popup_message": "Principal amount must be greater than 0."
+            })
 
-        if not start_date_str:
-            return render(request, "update_debit.html", {"debit": debit,
-                "popup_message": "Select a valid start date."})
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
-
-        # DEFAULTS
+        # Defaults
         emi_type = EmiCategory.NO
         installment_frequency = InstallmentCategory.WEEKLY
         n_installments = 0
         emi_interest_rate = 0.0
         emi_amount = 0.0
+        last_emi_amount = 0.0
 
         if is_emi:
             emi_type = request.POST.get("emi_type")
             installment_frequency = request.POST.get("installment_frequency")
-            installments_str = request.POST.get("installments")
+            n_installments = int(request.POST.get("installments", 0))
 
-            if not emi_type or emi_type == EmiCategory.NO:
-                return render(request, "update_debit.html", {"debit": debit,
-                    "popup_message": "Select a valid EMI type."})
+            if n_installments <= 0:
+                return render(request, "update_debit.html", {
+                    "debit": debit,
+                    "popup_message": "Number of installments must be greater than 0."
+                })
 
-            if not installment_frequency:
-                return render(request, "update_debit.html", {"debit": debit,
-                    "popup_message": "Select installment frequency."})
-
-            if not installments_str or int(installments_str) <= 0:
-                return render(request, "update_debit.html", {"debit": debit,
-                    "popup_message": "Number of installments must be greater than 0."})
-            n_installments = int(installments_str)
-
+            # -------- CUSTOM EMI --------
             if emi_type == EmiCategory.CUSTOM:
-                emi_amt_str = request.POST.get("emi_amt")
-                if not emi_amt_str or float(emi_amt_str) <= 0:
-                    return render(request, "update_debit.html", {"debit": debit,
-                        "popup_message": "Enter valid custom EMI amount."})
-                emi_amount = float(emi_amt_str)
+                emi_amount = float(request.POST.get("emi_amt", 0))
+                different_last = request.POST.get("different_last_installment") == "on"
 
-                if principal_amount <= (n_installments * emi_amount):
-                    return render(request, "update_debit.html", {"debit": debit,
-                        "popup_message": "Principal must be greater than total EMI for Custom EMI."})
+                if emi_amount <= 0:
+                    return render(request, "update_debit.html", {
+                        "debit": debit,
+                        "popup_message": "Enter valid EMI amount."
+                    })
+
+                if different_last:
+                    last_emi_amount = float(request.POST.get("last_installment_amount", 0))
+                    total = emi_amount * (n_installments - 1) + last_emi_amount
+                else:
+                    last_emi_amount = emi_amount
+                    total = emi_amount * n_installments
+
+                if abs(total - principal_amount) > 0.01:
+                    return render(request, "update_debit.html", {
+                        "debit": debit,
+                        "popup_message": "Total EMI must equal principal amount."
+                    })
+
+            # -------- INTEREST EMI --------
             else:
-                interest_str = request.POST.get("emi_interest_rate")
-                if not interest_str:
-                    return render(request, "update_debit.html", {"debit": debit,
-                        "popup_message": "Enter EMI interest rate."})
-                emi_interest_rate = float(interest_str)
-                emi_amount = emi_amount_fn(emi_type, emi_interest_rate, principal_amount, n_installments)
+                emi_interest_rate = float(request.POST.get("emi_interest_rate", 0))
+                emi_amount = emi_amount_fn(
+                    emi_type, emi_interest_rate, principal_amount, n_installments
+                )
+                last_emi_amount = emi_amount
 
-        # --- UPDATE DEBIT ---
+        # Update Debit
         maturity_date = maturity_date_fn(start_date, n_installments, installment_frequency)
-        now = datetime.now()
-        status = "PENDING"
 
-        debit.user = request.user
         debit.lender_name = lender_name
         debit.amount = principal_amount
         debit.interest_percent = emi_interest_rate
@@ -336,25 +448,24 @@ def update_debit(request, pk):
         debit.emi_period = n_installments
         debit.installment_type = installment_frequency
         debit.emi_amount = emi_amount
-        debit.status = status
+        debit.last_emi_amount = last_emi_amount
         debit.notes = notes
-        debit.updated_at = now
+        debit.updated_at = datetime.now()
         debit.save()
 
-        # --- RESET FIRST EMI ---
+        # Reset first EMI
         if is_emi:
-            if installment_frequency == InstallmentCategory.MONTHLY:
-                first_emi_due_date = start_date + relativedelta(months=1)
-            else:
-                first_emi_due_date = start_date + relativedelta(weeks=1)
+            first_due_date = (
+                start_date + relativedelta(months=1)
+                if installment_frequency == InstallmentCategory.MONTHLY
+                else start_date + relativedelta(weeks=1)
+            )
 
             if first_emi:
-                first_emi.user = request.user
-                first_emi.sequence_number = 1
                 first_emi.amount = emi_amount
-                first_emi.due_date = first_emi_due_date
-                first_emi.paid_date = None
+                first_emi.due_date = first_due_date
                 first_emi.status = "PENDING"
+                first_emi.paid_date = None
                 first_emi.save()
             else:
                 EMI.objects.create(
@@ -363,18 +474,15 @@ def update_debit(request, pk):
                     debit=debit,
                     sequence_number=1,
                     amount=emi_amount,
-                    due_date=first_emi_due_date,
-                    paid_date=None,
+                    due_date=first_due_date,
                     status="PENDING"
                 )
 
         return redirect("view_all")
 
-    context = {
+    return render(request, "update_debit.html", {
         "debit": debit,
         "emi_types": EmiCategory.choices,
         "installment_types": InstallmentCategory.choices,
-        "existing_emis": EMI.objects.filter(debit=debit).order_by('sequence_number'),
-        "popup_message": popup_message if 'popup_message' in locals() else None,
-    }
-    return render(request, "update_debit.html", context)
+        "existing_emis": EMI.objects.filter(debit=debit).order_by("sequence_number"),
+    })

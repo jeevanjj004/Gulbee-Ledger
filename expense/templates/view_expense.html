@@ -133,14 +133,6 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
-        
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= PAGE CONTENT ================= */
         .page-container {
@@ -168,6 +160,132 @@
         
         .page-title i {
             color: var(--primary);
+        }
+        
+        /* ================= FILTER & SEARCH SECTION ================= */
+        .filter-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 16px var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-container {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-main);
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 0.75rem 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            min-width: 150px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .btn-clear {
+            padding: 0.75rem 1.25rem;
+            background: var(--danger-light);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius);
+            color: var(--danger);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-clear:hover {
+            background: rgba(239, 68, 68, 0.25);
         }
         
         /* ================= SUMMARY CARD ================= */
@@ -282,6 +400,7 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 16px var(--shadow);
             overflow: hidden;
+            width: 100%;
         }
         
         .table-header {
@@ -599,6 +718,28 @@
                 justify-content: center;
             }
             
+            .filter-section {
+                padding: 1.25rem;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                min-width: 100%;
+            }
+            
+            .filter-container {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .filter-select {
+                min-width: 100%;
+            }
+            
             .summary-card {
                 flex-direction: column;
                 align-items: stretch;
@@ -751,6 +892,11 @@
                 padding: 1rem;
             }
             
+            .filter-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
             .summary-card {
                 padding: 1rem;
                 margin-bottom: 1rem;
@@ -772,6 +918,12 @@
                 padding: 1.5rem 2rem;
             }
         }
+        .page-container.full-width {
+    max-width: 100%;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
     </style>
 </head>
 
@@ -810,15 +962,33 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div class="page-container">
+    <div class="page-container full-width">
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">
@@ -826,6 +996,56 @@
                 All Expenses
             </h1>
         </div>
+
+        <!-- Filter & Search Section -->
+               <!-- Filter & Search Section -->
+           <!-- Filter & Search Section -->
+<div class="filter-section">
+    <form method="GET" action="{% url 'view_all_expense' %}" id="filterForm">
+        <div class="filter-row">
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" 
+                           name="search"
+                           id="searchInput" 
+                           class="search-input" 
+                           placeholder="Search by Expense ID or Title..."
+                           value="{{ search_query|default:'' }}">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            
+            <!-- Filter Options -->
+            <div class="filter-container">
+                <!-- Date Sort -->
+                <select name="date_sort" id="dateSort" class="filter-select">
+                    <option value="newest" {% if date_sort == "newest" or not date_sort %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if date_sort == "oldest" %}selected{% endif %}>Oldest First</option>
+                </select>
+                
+                <!-- Amount Sort -->
+                <select name="amount_sort" id="amountSort" class="filter-select">
+                    <option value="">Sort by Amount</option>
+                    <option value="high" {% if amount_sort == "high" %}selected{% endif %}>High to Low</option>
+                    <option value="low" {% if amount_sort == "low" %}selected{% endif %}>Low to High</option>
+                </select>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="filter-actions">
+                <button type="submit" id="applyFilters" class="filter-btn active">
+                    <i class="fas fa-filter"></i>
+                    Apply Filters
+                </button>
+                <button type="button" id="clearFilters" class="btn-clear">
+                    <i class="fas fa-times"></i>
+                    Clear All
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
 
         <!-- Summary Card -->
         <div class="summary-card">
@@ -836,7 +1056,7 @@
                 <div class="total-details">
                     <div class="total-label">Total Expenses</div>
                     <div class="total-amount">₹{{ total_expense }}</div>
-                    <div class="total-subtext">{{ expenses|length }} expense{{ expenses|length|pluralize }} recorded</div>
+                    <div class="total-subtext">{{ filtered_count|default:expenses|length }} expense{{ filtered_count|default:expenses|length|pluralize }} found</div>
                 </div>
             </div>
             
@@ -861,18 +1081,12 @@
                 </div>
                 <div class="table-stats">
                     <div class="stat-item">
-                        <div class="stat-label">Total Records</div>
-                        <div class="stat-value">{{ expenses|length }}</div>
+                        <div class="stat-label">Showing</div>
+                        <div class="stat-value" id="showingCount">{{ filtered_count|default:expenses|length }}</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Latest</div>
-                        <div class="stat-value">
-                            {% if expenses %}
-                                {{ expenses.0.date }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </div>
+                        <div class="stat-label">Total Amount</div>
+                        <div class="stat-value">₹{{ total_expense }}</div>
                     </div>
                 </div>
             </div>
@@ -893,9 +1107,9 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="expensesTableBody">
                             {% for exp in expenses %}
-                            <tr>
+                            <tr class="expense-row">
                                 <td class="expense-id" data-label="Expense ID">
                                     {{ exp.expense_id }}
                                 </td>
@@ -903,14 +1117,14 @@
                                     {{ exp.title }}
                                 </td>
                                 <td data-label="Category">
-                                    <span class="category-badge">
+                                    <span class="category-badge" data-category="{{ exp.category }}">
                                         {{ exp.get_category_display }}
                                     </span>
                                 </td>
-                                <td class="date-cell" data-label="Date">
+                                <td class="date-cell" data-label="Date" data-date="{{ exp.date|date:'Y-m-d' }}">
                                     {{ exp.date }}
                                 </td>
-                                <td class="amount-cell" data-label="Amount">
+                                <td class="amount-cell" data-label="Amount" data-amount="{{ exp.amount }}">
                                     ₹{{ exp.amount }}
                                 </td>
                                 <td class="paid-to" data-label="Paid To">
@@ -950,7 +1164,7 @@
                         <i class="fas fa-receipt"></i>
                     </div>
                     <h3 class="empty-state-title">No Expenses Found</h3>
-                    <p class="empty-state-text">
+                    <p class="empty-state-text" id="emptyStateText">
                         You haven't recorded any expenses yet. Start tracking your spending to better manage your finances.
                     </p>
                     <a href="{% url 'add_expense' %}" class="btn-action btn-add">
@@ -967,6 +1181,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobileMenuToggle');
             const mainMenu = document.getElementById('mainMenu');
+            const searchInput = document.getElementById('searchInput');
+            const dateSort = document.getElementById('dateSort');
+            const amountSort = document.getElementById('amountSort');
+            const applyFiltersBtn = document.getElementById('applyFilters');
+            const clearFiltersBtn = document.getElementById('clearFilters');
+            const filterForm = document.getElementById('filterForm');
+            const expenseRows = document.querySelectorAll('.expense-row');
             
             // Toggle mobile menu
             mobileMenuToggle.addEventListener('click', function() {
@@ -1003,8 +1224,7 @@
             });
             
             // Add table row animations
-            const tableRows = document.querySelectorAll('.expenses-table tbody tr');
-            tableRows.forEach((row, index) => {
+            expenseRows.forEach((row, index) => {
                 row.style.opacity = '0';
                 row.style.transform = 'translateY(10px)';
                 
@@ -1047,123 +1267,60 @@
                 }
             });
             
-            // Category color coding (optional enhancement)
-            const categoryBadges = document.querySelectorAll('.category-badge');
-            const categoryColors = {
-                'FOOD': { bg: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: 'rgba(239, 68, 68, 0.3)' },
-                'TRANSPORT': { bg: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: 'rgba(59, 130, 246, 0.3)' },
-                'ENTERTAINMENT': { bg: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: 'rgba(168, 85, 247, 0.3)' },
-                'SHOPPING': { bg: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: 'rgba(245, 158, 11, 0.3)' },
-                'BILLS': { bg: 'rgba(14, 165, 233, 0.15)', color: '#0ea5e9', border: 'rgba(14, 165, 233, 0.3)' },
-                'HEALTH': { bg: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: 'rgba(16, 185, 129, 0.3)' },
-                'EDUCATION': { bg: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6', border: 'rgba(139, 92, 246, 0.3)' },
-                'OTHER': { bg: 'rgba(100, 116, 139, 0.15)', color: '#64748b', border: 'rgba(100, 116, 139, 0.3)' }
-            };
+            // ================= FILTER & SEARCH FUNCTIONALITY =================
             
-            categoryBadges.forEach(badge => {
-                const text = badge.textContent.trim().toUpperCase();
-                if (categoryColors[text]) {
-                    badge.style.background = categoryColors[text].bg;
-                    badge.style.color = categoryColors[text].color;
-                    badge.style.borderColor = categoryColors[text].border;
+            // Clear all filters
+            function clearFilters() {
+                searchInput.value = '';
+                dateSort.value = 'newest';
+                amountSort.value = '';
+                
+                // Submit the form to reload with cleared filters
+                filterForm.submit();
+            }
+            
+            // Auto-submit when select changes (optional)
+            dateSort.addEventListener('change', function() {
+                filterForm.submit();
+            });
+            
+            amountSort.addEventListener('change', function() {
+                filterForm.submit();
+            });
+            
+            // Search on Enter key
+            searchInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    filterForm.submit();
                 }
             });
             
-            // Bill preview modal (optional)
-            const billThumbs = document.querySelectorAll('.bill-thumb');
-            billThumbs.forEach(thumb => {
-                thumb.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 640) {
-                        e.preventDefault();
-                        const src = this.getAttribute('src');
-                        showImagePreview(src);
-                    }
-                });
+            // Auto-submit search after typing stops (debounce)
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    filterForm.submit();
+                }, 800);
             });
             
-            function showImagePreview(src) {
-                // Create modal overlay
-                const overlay = document.createElement('div');
-                overlay.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0, 0, 0, 0.9);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 2000;
-                    padding: 1rem;
-                `;
-                
-                // Create image container
-                const imgContainer = document.createElement('div');
-                imgContainer.style.cssText = `
-                    position: relative;
-                    max-width: 90%;
-                    max-height: 90%;
-                `;
-                
-                // Create image
-                const img = document.createElement('img');
-                img.src = src;
-                img.style.cssText = `
-                    width: 100%;
-                    height: auto;
-                    border-radius: 8px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-                `;
-                
-                // Create close button
-                const closeBtn = document.createElement('button');
-                closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-                closeBtn.style.cssText = `
-                    position: absolute;
-                    top: -20px;
-                    right: -20px;
-                    background: var(--danger);
-                    color: white;
-                    border: none;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    font-size: 1.2rem;
-                `;
-                
-                closeBtn.addEventListener('click', function() {
-                    document.body.removeChild(overlay);
+            // Event Listeners
+            clearFiltersBtn.addEventListener('click', clearFilters);
+            
+            // Highlight active filter buttons
+            function highlightActiveFilters() {
+                // Remove active class from all filter buttons
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
                 });
                 
-                // Close on overlay click
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === overlay) {
-                        document.body.removeChild(overlay);
-                    }
-                });
-                
-                // Add escape key support
-                const keyHandler = function(e) {
-                    if (e.key === 'Escape') {
-                        document.body.removeChild(overlay);
-                        document.removeEventListener('keydown', keyHandler);
-                    }
-                };
-                
-                document.addEventListener('keydown', keyHandler);
-                
-                // Assemble and add to DOM
-                imgContainer.appendChild(img);
-                imgContainer.appendChild(closeBtn);
-                overlay.appendChild(imgContainer);
-                document.body.appendChild(overlay);
+                // Add active class to apply filters button
+                applyFiltersBtn.classList.add('active');
             }
+            
+            // Initialize highlight
+            highlightActiveFilters();
         });
-    </script>
+        </script>
 </body>
 </html>

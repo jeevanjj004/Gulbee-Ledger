@@ -4,29 +4,76 @@ from dateutil.relativedelta import relativedelta
 from datetime import date
 from debit.views import emi_id_fn
 from debit.models import Debit
+from collections import defaultdict
 
+from django.db.models import Sum
 
 from django.core.mail import send_mail
 from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def view_emi(request):
-    user = request.user
-    emis = EMI.objects.filter(user=user).order_by("debit", "sequence_number")
+    emis = EMI.objects.filter(debit__user=request.user).order_by('debit', 'due_date')
+    
+    # Group EMIs by debit and calculate counts
+    debit_data = defaultdict(lambda: {
+        'debit': None,
+        'emis': [],
+        'overdue_count': 0,
+        'pending_count': 0,
+        'paid_count': 0,
+        'status': 'paid'
+    })
+    for emi in emis:
+        print("EMI ID:", emi.emi_id)
+        print("Bill photo:", emi.bill_photo)
+        print("Bill photo URL:", emi.bill_photo.url if emi.bill_photo else "No bill")
+    for emi in emis:
+        debit = emi.debit
+        if debit not in debit_data:
+            debit_data[debit]['debit'] = debit
+        
+        debit_data[debit]['emis'].append(emi)
+        
+        if emi.status == "OVERDUE":
+            debit_data[debit]['overdue_count'] += 1
+            debit_data[debit]['status'] = 'overdue'
+        elif emi.status == "PENDING":
+            debit_data[debit]['pending_count'] += 1
+            # Only set to pending if not already overdue
+            if debit_data[debit]['status'] != 'overdue':
+                debit_data[debit]['status'] = 'pending'
+        elif emi.status == "PAID":
+            debit_data[debit]['paid_count'] += 1
+    
+    # Convert to list for template
+    debit_groups = list(debit_data.values())
+    
+    return render(request, "view_all_emi.html", {
+        "debit_groups": debit_groups,
+        "emis": emis  # Keep this if you still need it elsewhere
+    })
 
-    return render(request, "view_all_emi.html", {"emis": emis})
 
+@login_required
 def pay_emi(request, emi_id):
     emi = get_object_or_404(EMI, emi_id=emi_id)
-    debit = emi.debit  # Related Debit object
+    debit = emi.debit
 
     if request.method == "POST":
-        # Mark current EMI as paid
+        # Process bill photo upload
+        bill_photo = request.FILES.get('bill_photo')
+        if bill_photo:
+            emi.bill_photo = bill_photo
+        # 1️⃣ Mark current EMI as PAID
         emi.status = "PAID"
         emi.paid_date = date.today()
         emi.save()
 
-        # Create next EMI only if pending installments exist
+        # 2️⃣ Create next EMI only if pending installments exist
         if emi.sequence_number < debit.emi_period:
             next_seq = emi.sequence_number + 1
 
@@ -36,18 +83,24 @@ def pay_emi(request, emi_id):
             else:
                 next_due_date = emi.due_date + relativedelta(weeks=1)
 
-            # Create the next EMI record with status "PENDING"
+            if next_seq == debit.emi_period:
+                # LAST EMI
+                next_amount = debit.last_emi_amount
+            else:
+                next_amount = debit.emi_amount
+
             EMI.objects.create(
                 user=request.user,
                 emi_id=emi_id_fn(),
                 debit=debit,
                 sequence_number=next_seq,
-                amount=debit.emi_amount,
+                amount=next_amount,
+               
                 due_date=next_due_date,
-                status="PENDING"   # <-- should be PENDING, not PAID
+                status="PENDING"
             )
 
-        # Check after saving current EMI: if it’s the last, mark Debit completed
+        # 3️⃣ If this was the LAST EMI → mark Debit COMPLETED
         if emi.sequence_number == debit.emi_period:
             debit.status = "COMPLETED"
             debit.save()
@@ -55,31 +108,56 @@ def pay_emi(request, emi_id):
         return redirect("view_all_emi")
 
     return render(request, "pay_emi.html", {"emi": emi})
-
 def emi_details(request, debit_id):
-    # Get Debit info
-    debit = Debit.objects.get(debit_id=debit_id)
+    debit = get_object_or_404(Debit, debit_id=debit_id)
+    
+    # Get existing payment records from DB to check if actually PAID
+    recorded_emis = EMI.objects.filter(debit_id=debit_id).order_by('sequence_number')
+    emi_map = {emi.sequence_number: emi for emi in recorded_emis}
+
     n_installment = debit.emi_period
     installment_type = debit.installment_type
     start_date = debit.start_date
+    
+    emi_rows = []
+    current_due_date = start_date
 
-    # All EMIs for this debit
-    emis = EMI.objects.filter(debit_id=debit_id).order_by('sequence_number')
-
-    # Generate EMI dates (if you want planned dates)
-    emi_dates = {}
-    temp = start_date
-    for i in range(1, n_installment + 1):
+    for seq in range(1, n_installment + 1):
+        # 1. Calculate Date
         if installment_type == "MONTHLY":
-            temp += relativedelta(months=1)
+            current_due_date += relativedelta(months=1)
         elif installment_type == "WEEKLY":
-            temp += relativedelta(weeks=1)
-        emi_dates[i] = temp
+            current_due_date += relativedelta(weeks=1)
+
+        # 2. Determine Amount (Use last_emi_amount for the final installment)
+        if seq == n_installment:
+            display_amount = debit.last_emi_amount
+        else:
+            display_amount = debit.emi_amount
+
+        # 3. Check DB for actual status, else default to "PENDING"
+        emi_obj = emi_map.get(seq)
+        if emi_obj:
+            current_status = emi_obj.status
+            paid_date = emi_obj.paid_date
+        else:
+            current_status = "PENDING"
+            paid_date = None
+
+        emi_rows.append({
+            "sequence": seq,
+            "due_date": current_due_date,
+            "amount": display_amount,
+            "status": current_status,
+            "paid_date": paid_date
+        })
+
+    # Count remaining based on the calculated list where status != PAID
+    remaining_count = sum(1 for item in emi_rows if item['status'] != "PAID")
 
     context = {
         "debit": debit,
-        "emis": emis,
-        "emi_dates": emi_dates,
+        "emi_rows": emi_rows,
+        "remaining_emi": remaining_count,
     }
-
     return render(request, "emi_details.html", context)

@@ -132,14 +132,6 @@
             border-radius: 2px;
         }
         
-        .logout-link {
-            color: var(--danger);
-            margin-left: 0.5rem;
-        }
-        
-        .logout-link:hover {
-            color: #fca5a5;
-        }
         
         /* ================= PAGE CONTENT ================= */
         .page-content {
@@ -465,10 +457,28 @@
                 <i class="fas fa-chart-bar"></i>
                 <span>Reports</span>
             </a>
-            <a href="{% url 'login' %}" class="menu-link logout-link">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
+            <form method="post" action="{% url 'logout' %}" style="display:inline; margin:0;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="
+                        background: none;
+                        border: none;
+                        padding: 0;
+                        margin: 0;
+                        cursor: pointer;
+                        color: #ef4444;
+                        font-weight: 500;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                    "
+                    onmouseover="this.style.color='#fca5a5';"
+                    onmouseout="this.style.color='#ef4444';">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
         </div>
     </div>
 
@@ -592,146 +602,177 @@
 
     <!-- JavaScript -->
     // JavaScript
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Mobile menu toggle
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const mainMenu = document.getElementById('mainMenu');
-        
-        mobileMenuToggle.addEventListener('click', function() {
-            mainMenu.classList.toggle('active');
-            const icon = this.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
-                mainMenu.classList.remove('active');
-                const icon = mobileMenuToggle.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-        
-        // Form validation
-        const form = document.getElementById('addIncomeForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const fields = {
-            category: document.getElementById('id_category'),
-            source: document.getElementById('id_source'),
-            date: document.getElementById('id_date'),
-            amount: document.getElementById('id_amount')
-        };
-        
-        // Set today as default date
-        const today = new Date().toISOString().split('T')[0];
-        if (fields.date && !fields.date.value) {
-            fields.date.value = today;
-        }
-        
-        // Set max date to today
-        fields.date.max = today;
-        
-        // Validate form on submit
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mainMenu = document.getElementById('mainMenu');
             
-            // Clear previous errors
-            Object.values(fields).forEach(field => {
+            mobileMenuToggle.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mainMenu.contains(event.target) && !mobileMenuToggle.contains(event.target)) {
+                    mainMenu.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Form validation
+            const form = document.getElementById('addIncomeForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const fields = {
+                category: document.getElementById('id_category'),
+                source: document.getElementById('id_source'),
+                date: document.getElementById('id_date'),
+                amount: document.getElementById('id_amount')
+            };
+            
+            // Set today as default date
+            const today = new Date().toISOString().split('T')[0];
+            if (fields.date && !fields.date.value) {
+                fields.date.value = today;
+            }
+            
+            // Set max date to today
+            fields.date.max = today;
+            
+            // Function to show error message
+            function showErrorMessage(field, message) {
+                // Remove existing error message for this field
+                const existingError = field.parentElement.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                // Create and add new error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message text-danger mt-2';
+                errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-1"></i> ${message}`;
+                errorDiv.style.fontSize = '0.875rem';
+                errorDiv.style.color = '#ef4444';
+                
+                field.parentElement.appendChild(errorDiv);
+                field.classList.add('is-invalid');
+            }
+            
+            // Function to remove error message
+            function removeErrorMessage(field) {
+                const errorDiv = field.parentElement.querySelector('.error-message');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
                 field.classList.remove('is-invalid');
-            });
-            
-            // Validate each field
-            if (!fields.category.value) {
-                fields.category.classList.add('is-invalid');
-                isValid = false;
             }
             
-            if (!fields.source.value.trim()) {
-                fields.source.classList.add('is-invalid');
-                isValid = false;
-            }
-            
-            if (!fields.date.value) {
-                fields.date.classList.add('is-invalid');
-                isValid = false;
-            } else if (fields.date.value > today) {
-                fields.date.classList.add('is-invalid');
-                // REMOVED ALERT: alert('Date cannot be in the future');
-                isValid = false;
-            }
-            
-            const amount = parseFloat(fields.amount.value);
-            if (!fields.amount.value || isNaN(amount) || amount <= 0) {
-                fields.amount.classList.add('is-invalid');
-                isValid = false;
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-                e.stopPropagation();
-                // Scroll to first error
-                const firstError = form.querySelector('.is-invalid');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    firstError.focus();
+            // Validate form on submit
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Clear all previous error messages
+                Object.values(fields).forEach(field => {
+                    removeErrorMessage(field);
+                });
+                
+                // Validate each field
+                if (!fields.category.value) {
+                    showErrorMessage(fields.category, 'Please select a category');
+                    isValid = false;
                 }
-            } else {
-                // Show loading state
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Income...';
-                submitBtn.disabled = true;
-            }
-        });
-        
-        // Real-time validation - REMOVE alerts
-        Object.values(fields).forEach(field => {
-            field.addEventListener('input', function() {
-                this.classList.remove('is-invalid');
-            });
-            
-            field.addEventListener('blur', function() {
-                if (this.id === 'id_amount') {
-                    const amount = parseFloat(this.value);
-                    if (this.value && (isNaN(amount) || amount <= 0)) {
-                        this.classList.add('is-invalid');
+                
+                if (!fields.source.value.trim()) {
+                    showErrorMessage(fields.source, 'Please enter the income source');
+                    isValid = false;
+                }
+                
+                if (!fields.date.value) {
+                    showErrorMessage(fields.date, 'Please select a date');
+                    isValid = false;
+                } else if (fields.date.value > today) {
+                    showErrorMessage(fields.date, 'Date cannot be in the future');
+                    isValid = false;
+                }
+                
+                const amount = parseFloat(fields.amount.value);
+                if (!fields.amount.value) {
+                    showErrorMessage(fields.amount, 'Please enter the amount');
+                    isValid = false;
+                } else if (isNaN(amount) || amount <= 0) {
+                    showErrorMessage(fields.amount, 'Please enter a valid positive amount');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Scroll to first error
+                    const firstError = form.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
                     }
-                } else if (this.id === 'id_date' && this.value > today) {
-                    this.classList.add('is-invalid');
-                    // REMOVED ALERT: alert('Date cannot be in the future');
+                } else {
+                    // Show loading state
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Income...';
+                    submitBtn.disabled = true;
                 }
             });
-        });
-        
-        // Add animation to form card
-        const formCard = document.querySelector('.form-card');
-        formCard.style.opacity = '0';
-        formCard.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            formCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-            formCard.style.opacity = '1';
-            formCard.style.transform = 'translateY(0)';
-        }, 300);
-        
-        // Input focus effects
-        const inputs = form.querySelectorAll('.form-control, .form-select');
-        inputs.forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'translateY(-2px)';
+            
+            // Real-time validation
+            Object.values(fields).forEach(field => {
+                field.addEventListener('input', function() {
+                    removeErrorMessage(this);
+                });
+                
+                field.addEventListener('blur', function() {
+                    removeErrorMessage(this);
+                    
+                    if (this.id === 'id_amount') {
+                        const amount = parseFloat(this.value);
+                        if (this.value && (isNaN(amount) || amount <= 0)) {
+                            showErrorMessage(this, 'Please enter a valid positive amount');
+                        }
+                    } else if (this.id === 'id_date' && this.value > today) {
+                        showErrorMessage(this, 'Date cannot be in the future');
+                    }
+                });
             });
             
-            input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'translateY(0)';
+            // Add animation to form card
+            const formCard = document.querySelector('.form-card');
+            formCard.style.opacity = '0';
+            formCard.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                formCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                formCard.style.opacity = '1';
+                formCard.style.transform = 'translateY(0)';
+            }, 300);
+            
+            // Input focus effects
+            const inputs = form.querySelectorAll('.form-control, .form-select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
             });
+            
+            // Auto-focus first field
+            if (fields.source) {
+                fields.source.focus();
+            }
         });
-        
-        // Auto-focus first field
-        if (fields.source) {
-            fields.source.focus();
-        }
-    });
-</script>
+    </script>
 </body>
 </html>
