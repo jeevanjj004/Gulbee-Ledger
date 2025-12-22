@@ -10,23 +10,16 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # =========================
 # SECURITY
 # =========================
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-
-#DEBUG = os.getenv("DEBUG", "False") == "True"
-#change to 
-DEBUG = False
-
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-
 
 # =========================
 # APPLICATIONS
@@ -53,15 +46,13 @@ INSTALLED_APPS = [
     'reports',
 ]
 
-
 # =========================
 # MIDDLEWARE
 # =========================
 
 MIDDLEWARE = [
-        'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -70,15 +61,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 # =========================
 # URLS / WSGI
 # =========================
 
 ROOT_URLCONF = 'exp_tracker.urls'
-
 WSGI_APPLICATION = 'exp_tracker.wsgi.application'
-
 
 # =========================
 # TEMPLATES
@@ -100,25 +88,20 @@ TEMPLATES = [
     },
 ]
 
-
 # =========================
-# DATABASE
+# DATABASE (PostgreSQL)
 # =========================
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("DB_NAME"),
         'USER': os.getenv("DB_USER"),
         'PASSWORD': os.getenv("DB_PASSWORD"),
         'HOST': os.getenv("DB_HOST"),
-        'PORT': os.getenv("DB_PORT"),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
+        'PORT': os.getenv("DB_PORT", "5432"),
     }
 }
-
 
 # =========================
 # PASSWORD VALIDATION
@@ -131,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-
 # =========================
 # INTERNATIONALIZATION
 # =========================
@@ -141,36 +123,38 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
 # =========================
-# STATIC & MEDIA FILES
+# STATIC & MEDIA
 # =========================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# =========================
+# AUTH REDIRECTS
+# =========================
+
+LOGIN_URL = "login"
+LOGOUT_REDIRECT_URL = "login"
+
+# =========================
+# EMAIL CONFIG
+# =========================
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # =========================
 # DEFAULT PK
 # =========================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-# =========================
-# EMAIL CONFIGURATION
-# =========================
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-# settings.py
-LOGOUT_REDIRECT_URL = "login"
-LOGIN_URL = "login"
