@@ -23,6 +23,33 @@ Django-based ledger and loan management system for tracking income, expenses, an
 ---
 
 ## 💻 Installation / Setup
-1. **Clone the repository:**  
-   ```bash
-   git clone https://github.com/jeevanjj004/Gulbee-Ledger.git
+```bash
+# Clone the repository
+git clone https://github.com/jeevanjj004/Gulbee-Ledger.git
+
+# Navigate to project folder
+cd Gulbee-Ledger
+
+# Create a virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+# Windows
+venv\Scripts\activate
+# Linux / Mac
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Make migrations
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Run the development server
+python manage.py runserver
+
+# Open in browser
+http://127.0.0.1:8000/
