@@ -158,3 +158,18 @@ def emi_details(request, debit_id):
         "remaining_emi": remaining_count,
     }
     return render(request, "emi_details.html", context)
+
+
+
+from django.http import HttpResponse
+from django.core.mail import send_mail
+
+def test_email(request):
+    # send_mail(
+    #     "Test Email",
+    #     "This is a test email from Django.",
+    #     "internshipidk456@gmail.com",
+    #     ["thomasjj4u@gmail.com"],
+    #     fail_silently=False,
+    # )
+    return HttpResponse("Email sent")
