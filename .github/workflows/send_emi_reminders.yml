@@ -1,10 +1,6 @@
 name: Send EMI Reminders
 
 on:
-  schedule:
-    # Runs every day at 12:30 AM IST (7:00 PM UTC)
-    - cron: "0 19 * * *"
-
   workflow_dispatch:
 
 jobs:
@@ -15,10 +11,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install System Libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2-dev \
+            pkg-config \
+            libpango1.0-dev \
+            libgdk-pixbuf-2.0-dev
 
       - name: Install Dependencies
         run: |
@@ -28,18 +33,18 @@ jobs:
       - name: Run EMI Reminder Command
         env:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DEBUG: "False"
-
+          DEBUG: ${{ secrets.DEBUG }}
+          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
-
+          EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
           EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
           EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-
-          ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
-
+          EMAIL_USE_TLS: ${{ secrets.EMAIL_USE_TLS }}
+          DEFAULT_FROM_EMAIL: ${{ secrets.DEFAULT_FROM_EMAIL }}
         run: |
           python manage.py send_emi_reminders
