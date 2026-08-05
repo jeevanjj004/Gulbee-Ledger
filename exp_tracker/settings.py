@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third-party
-    'background_task',
     'widget_tweaks',
 
     # Local apps
