@@ -55,7 +55,7 @@ class Command(BaseCommand):
         self.stdout.write(f"EMAIL PORT: {settings.EMAIL_PORT}")
         self.stdout.write(f"EMAIL USER: {settings.EMAIL_HOST_USER}")
 
-        
+
         # Today's date
         today = date.today()
 
@@ -189,7 +189,7 @@ Please do not reply to this email.
                 send_mail(
                     subject=subject,
                     message=text_message,
-                    from_email=settings.EMAIL_HOST_USER,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[emi.user.email],
                     html_message=html_message,
                     fail_silently=False,
@@ -341,7 +341,7 @@ Please do not reply to this email.
                 send_mail(
                     subject=subject,
                     message=text_message,
-                    from_email=settings.EMAIL_HOST_USER,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[emi.user.email],
                     html_message=html_message,
                     fail_silently=False,

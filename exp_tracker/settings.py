@@ -158,8 +158,10 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 EMAIL_TIMEOUT = 30
 
-DEFAULT_FROM_EMAIL = "gulbeeledger@gmail.com"
-
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "gulbeeledger@gmail.com"
+)
 #cron secret id
 
 CRON_JOB_SECRET = os.getenv("CRON_JOB_SECRET")
