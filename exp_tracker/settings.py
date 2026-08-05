@@ -158,7 +158,7 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 EMAIL_TIMEOUT = 30
 
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = "gulbeeledger@gmail.com"
 
 #cron secret id
 
