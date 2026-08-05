@@ -13,6 +13,17 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
+
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.conf import settings
+from django.core.management import call_command
+
+from django.views.decorators.csrf import csrf_exempt
+
+
+
 @login_required
 def view_emi(request):
     emis = EMI.objects.filter(
@@ -161,15 +172,102 @@ def emi_details(request, debit_id):
 
 
 
-from django.http import HttpResponse
-from django.core.mail import send_mail
 
-def test_email(request):
-    # send_mail(
-    #     "Test Email",
-    #     "This is a test email from Django.",
-    #     "internshipidk456@gmail.com",
-    #     ["thomasjj4u@gmail.com"],
-    #     fail_silently=False,
-    # )
-    return HttpResponse("Email sent")
+
+
+@csrf_exempt
+@require_POST
+def run_emi_reminders(request):
+    """
+    -------------------------------------------------------------------------
+    Internal EMI Reminder Trigger
+    -------------------------------------------------------------------------
+
+    Purpose
+    -------
+    This endpoint is designed ONLY for automated schedulers
+    (e.g. cron-job.org).
+
+    Instead of GitHub Actions running:
+
+        python manage.py send_emi_reminders
+
+    cron-job.org will make an HTTPS POST request to this endpoint.
+
+    This endpoint then executes the existing Django management command.
+
+    Why use this approach?
+    ----------------------
+    - No GitHub Actions required.
+    - No Linux cron required.
+    - Works on Render Free.
+    - Reuses the already tested management command.
+    - Keeps reminder logic in one place.
+
+    Security
+    --------
+    This endpoint MUST NOT be publicly accessible.
+
+    Every request must include the following HTTP header:
+
+        X-CRON-TOKEN: <your_secret>
+
+    The secret is stored in:
+
+        settings.CRON_JOB_SECRET
+
+    If the provided token does not match the configured secret,
+    the request is rejected with HTTP 401 (Unauthorized).
+
+    Example request
+
+        POST /emi/internal/jobs/send-emi-reminders/
+
+        Header:
+
+            X-CRON-TOKEN: your-secret-token
+
+    Response
+
+        {
+            "status": "success"
+        }
+
+    -------------------------------------------------------------------------
+    """
+
+    # Read the custom authentication header sent by cron-job.org
+    token = request.headers.get("X-CRON-TOKEN")
+
+    # Reject unauthorized requests
+    if token != settings.CRON_JOB_SECRET:
+        return JsonResponse(
+            {
+                "status": "error",
+                "message": "Unauthorized",
+            },
+            status=401,
+        )
+
+    try:
+        # Execute the existing management command.
+        # This command contains all reminder logic,
+        # email sending, and database updates.
+        call_command("send_emi_reminders")
+
+        return JsonResponse(
+            {
+                "status": "success",
+                "message": "EMI reminders executed successfully.",
+            }
+        )
+
+    except Exception as e:
+        # Return the actual error for easier debugging.
+        return JsonResponse(
+            {
+                "status": "error",
+                "message": str(e),
+            },
+            status=500,
+        )
