@@ -50,11 +50,6 @@ class Command(BaseCommand):
         self.stdout.write("=" * 60)
 
 
-        # TEMP SMTP DEBUG
-        self.stdout.write(f"EMAIL HOST: {settings.EMAIL_HOST}")
-        self.stdout.write(f"EMAIL PORT: {settings.EMAIL_PORT}")
-        self.stdout.write(f"EMAIL USER: {settings.EMAIL_HOST_USER}")
-
 
         # Today's date
         today = date.today()
