@@ -1,0 +1,21 @@
+name: Schedule Test
+
+on:
+  schedule:
+    # Runs every 5 minutes (testing only)
+    - cron: "*/5 * * * *"
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Time
+        run: |
+          echo "================================"
+          echo "GitHub Scheduler is working!"
+          echo "Current UTC time:"
+          date -u
+          echo "================================"
