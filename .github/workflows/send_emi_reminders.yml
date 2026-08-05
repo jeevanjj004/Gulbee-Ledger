@@ -3,7 +3,7 @@ name: Send EMI Reminders
 on:
   schedule:
     # Runs every day at 12:30 AM IST (7:00 PM UTC)
-    - cron: "0 19 * * *"
+    - cron: "30 5 * * *"
 
   workflow_dispatch:
 
