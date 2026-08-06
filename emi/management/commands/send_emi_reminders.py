@@ -179,40 +179,41 @@ Please do not reply to this email.
 </html>
 """
 
-        try:
+            try:
 
-            self.stdout.write(f"Sending 5-day reminder to: {emi.user.email}")
+                self.stdout.write(f"Sending 5-day reminder to: {emi.user.email}")
 
-            result = send_mail(
-                subject=subject,
-                message=text_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[emi.user.email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-
-            self.stdout.write(f"send_mail() returned: {result}")
-
-            # Mark reminder as sent only if email was sent successfully
-            emi.reminder_5_days_sent = True
-            emi.save(update_fields=["reminder_5_days_sent"])
-
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"✓ 5-Day Reminder Sent -> {emi.user.email}"
+                result = send_mail(
+                    subject=subject,
+                    message=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[emi.user.email],
+                    html_message=html_message,
+                    fail_silently=False,
                 )
-            )
 
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(
-                    f"✗ Failed to send 5-day reminder to {emi.user.email}"
+                self.stdout.write(f"send_mail() returned: {result}")
+
+                # Mark reminder as sent only if email was sent successfully
+                emi.reminder_5_days_sent = True
+                emi.save(update_fields=["reminder_5_days_sent"])
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"✓ 5-Day Reminder Sent -> {emi.user.email}"
+                    )
                 )
-            )
-            self.stdout.write(
-                self.style.ERROR(f"Reason: {repr(e)}")
-            )
+
+            except Exception as e:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"✗ Failed to send 5-day reminder to {emi.user.email}"
+                    )
+                )
+                self.stdout.write(
+                    self.style.ERROR(f"Reason: {repr(e)}")
+                )
+
         # ============================================================
         # FIND EMIs DUE TODAY
         # ============================================================
@@ -238,9 +239,6 @@ Please do not reply to this email.
 
             debit_id = emi.debit.debit_id if emi.debit else "N/A"
             lender = emi.debit.lender_name if emi.debit else "N/A"
-
-
-
 
             subject = "🚨 EMI Due Today - Payment Required"
 
@@ -334,40 +332,41 @@ Please do not reply to this email.
 </html>
 """
 
-        try:
+            try:
 
-            self.stdout.write(f"Sending due-day reminder to: {emi.user.email}")
+                self.stdout.write(f"Sending due-day reminder to: {emi.user.email}")
 
-            result = send_mail(
-                subject=subject,
-                message=text_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[emi.user.email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-
-            self.stdout.write(f"send_mail() returned: {result}")
-
-            # Mark reminder as sent only after successful email delivery
-            emi.reminder_due_day_sent = True
-            emi.save(update_fields=["reminder_due_day_sent"])
-
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f"✓ Due Date Reminder Sent -> {emi.user.email}"
+                result = send_mail(
+                    subject=subject,
+                    message=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[emi.user.email],
+                    html_message=html_message,
+                    fail_silently=False,
                 )
-            )
 
-        except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(
-                    f"✗ Failed to send due date reminder to {emi.user.email}"
+                self.stdout.write(f"send_mail() returned: {result}")
+
+                # Mark reminder as sent only after successful email delivery
+                emi.reminder_due_day_sent = True
+                emi.save(update_fields=["reminder_due_day_sent"])
+
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"✓ Due Date Reminder Sent -> {emi.user.email}"
+                    )
                 )
-            )
-            self.stdout.write(
-                self.style.ERROR(f"Reason: {repr(e)}")
-            )
+
+            except Exception as e:
+                self.stdout.write(
+                    self.style.ERROR(
+                        f"✗ Failed to send due date reminder to {emi.user.email}"
+                    )
+                )
+                self.stdout.write(
+                    self.style.ERROR(f"Reason: {repr(e)}")
+                )
+
         # ============================================================
         # END OF COMMAND
         # ============================================================
