@@ -36,6 +36,9 @@ from django.core.mail import send_mail
 from emi.models import EMI, EmiStatus
 
 
+import smtplib
+import socket
+
 class Command(BaseCommand):
     help = "Send EMI reminder emails"
 
@@ -388,3 +391,37 @@ Please do not reply to this email.
         self.stdout.write(f"EMAIL SSL     : {settings.EMAIL_USE_SSL}")
         self.stdout.write(f"EMAIL TIMEOUT : {settings.EMAIL_TIMEOUT}")
         self.stdout.write(f"FROM EMAIL    : {settings.DEFAULT_FROM_EMAIL}")
+
+
+        self.stdout.write("=" * 60)
+        self.stdout.write("SMTP CONNECTIVITY TEST")
+        self.stdout.write("=" * 60)
+
+        try:
+            self.stdout.write("Opening socket...")
+
+            server = smtplib.SMTP(
+                settings.EMAIL_HOST,
+                settings.EMAIL_PORT,
+                timeout=20
+            )
+
+            self.stdout.write("Socket connected")
+
+            server.ehlo()
+            self.stdout.write("EHLO OK")
+
+            server.starttls()
+            self.stdout.write("TLS OK")
+
+            server.login(
+                settings.EMAIL_HOST_USER,
+                settings.EMAIL_HOST_PASSWORD
+            )
+
+            self.stdout.write("LOGIN OK")
+
+            server.quit()
+
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"SMTP TEST FAILED: {repr(e)}"))
