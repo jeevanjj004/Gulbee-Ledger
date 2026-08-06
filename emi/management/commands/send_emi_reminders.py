@@ -31,13 +31,11 @@ Project:
 from datetime import date, timedelta
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.core.mail import send_mail
-
+from exp_tracker.utils.brevo_mail import send_brevo_email
 from emi.models import EMI, EmiStatus
 
 
-import smtplib
-import socket
+
 
 class Command(BaseCommand):
     help = "Send EMI reminder emails"
@@ -183,21 +181,18 @@ Please do not reply to this email.
 """
 
             try:
-
                 self.stdout.write(f"Sending 5-day reminder to: {emi.user.email}")
 
-                result = send_mail(
+                result = send_brevo_email(
                     subject=subject,
-                    message=text_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[emi.user.email],
-                    html_message=html_message,
-                    fail_silently=False,
+                    html_content=html_message,
+                    text_content=text_message,
+                    to_email=emi.user.email,
+                    to_name=emi.user.first_name,
                 )
 
-                self.stdout.write(f"send_mail() returned: {result}")
+                self.stdout.write(f"Brevo Response: {result}")
 
-                # Mark reminder as sent only if email was sent successfully
                 emi.reminder_5_days_sent = True
                 emi.save(update_fields=["reminder_5_days_sent"])
 
@@ -216,7 +211,6 @@ Please do not reply to this email.
                 self.stdout.write(
                     self.style.ERROR(f"Reason: {repr(e)}")
                 )
-
         # ============================================================
         # FIND EMIs DUE TODAY
         # ============================================================
@@ -336,21 +330,18 @@ Please do not reply to this email.
 """
 
             try:
-
                 self.stdout.write(f"Sending due-day reminder to: {emi.user.email}")
 
-                result = send_mail(
+                result = send_brevo_email(
                     subject=subject,
-                    message=text_message,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[emi.user.email],
-                    html_message=html_message,
-                    fail_silently=False,
+                    html_content=html_message,
+                    text_content=text_message,
+                    to_email=emi.user.email,
+                    to_name=emi.user.first_name,
                 )
 
-                self.stdout.write(f"send_mail() returned: {result}")
+                self.stdout.write(f"Brevo Response: {result}")
 
-                # Mark reminder as sent only after successful email delivery
                 emi.reminder_due_day_sent = True
                 emi.save(update_fields=["reminder_due_day_sent"])
 
@@ -379,49 +370,10 @@ Please do not reply to this email.
             self.style.SUCCESS("EMI Reminder Command Finished Successfully")
         )
         self.stdout.write("=" * 60)
-        # ============================================================
-        # EMAIL CONFIG DEBUG
-        # ============================================================
+        self.stdout.write(f"FROM EMAIL    : {settings.DEFAULT_FROM_EMAIL}")
+        self.stdout.write(f"BREVO API KEY : {'Configured' if settings.BREVO_API_KEY else 'Missing'}")
 
-        self.stdout.write(f"EMAIL BACKEND : {settings.EMAIL_BACKEND}")
-        self.stdout.write(f"EMAIL HOST    : {settings.EMAIL_HOST}")
-        self.stdout.write(f"EMAIL PORT    : {settings.EMAIL_PORT}")
-        self.stdout.write(f"EMAIL USER    : {settings.EMAIL_HOST_USER}")
-        self.stdout.write(f"EMAIL TLS     : {settings.EMAIL_USE_TLS}")
-        self.stdout.write(f"EMAIL SSL     : {settings.EMAIL_USE_SSL}")
-        self.stdout.write(f"EMAIL TIMEOUT : {settings.EMAIL_TIMEOUT}")
         self.stdout.write(f"FROM EMAIL    : {settings.DEFAULT_FROM_EMAIL}")
 
 
-        self.stdout.write("=" * 60)
-        self.stdout.write("SMTP CONNECTIVITY TEST")
-        self.stdout.write("=" * 60)
-
-        try:
-            self.stdout.write("Opening socket...")
-
-            server = smtplib.SMTP(
-                settings.EMAIL_HOST,
-                settings.EMAIL_PORT,
-                timeout=20
-            )
-
-            self.stdout.write("Socket connected")
-
-            server.ehlo()
-            self.stdout.write("EHLO OK")
-
-            server.starttls()
-            self.stdout.write("TLS OK")
-
-            server.login(
-                settings.EMAIL_HOST_USER,
-                settings.EMAIL_HOST_PASSWORD
-            )
-
-            self.stdout.write("LOGIN OK")
-
-            server.quit()
-
-        except Exception as e:
-            self.stdout.write(self.style.ERROR(f"SMTP TEST FAILED: {repr(e)}"))
+        

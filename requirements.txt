@@ -37,6 +37,7 @@ PyYAML==6.0.3
 reportlab==4.4.5
 requests==2.32.5
 rlPyCairo==0.4.0
+sib-api-v3-sdk==7.6.0
 six==1.17.0
 sqlparse==0.5.4
 svglib==1.6.0
