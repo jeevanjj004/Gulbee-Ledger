@@ -376,3 +376,15 @@ Please do not reply to this email.
             self.style.SUCCESS("EMI Reminder Command Finished Successfully")
         )
         self.stdout.write("=" * 60)
+        # ============================================================
+        # EMAIL CONFIG DEBUG
+        # ============================================================
+
+        self.stdout.write(f"EMAIL BACKEND : {settings.EMAIL_BACKEND}")
+        self.stdout.write(f"EMAIL HOST    : {settings.EMAIL_HOST}")
+        self.stdout.write(f"EMAIL PORT    : {settings.EMAIL_PORT}")
+        self.stdout.write(f"EMAIL USER    : {settings.EMAIL_HOST_USER}")
+        self.stdout.write(f"EMAIL TLS     : {settings.EMAIL_USE_TLS}")
+        self.stdout.write(f"EMAIL SSL     : {settings.EMAIL_USE_SSL}")
+        self.stdout.write(f"EMAIL TIMEOUT : {settings.EMAIL_TIMEOUT}")
+        self.stdout.write(f"FROM EMAIL    : {settings.DEFAULT_FROM_EMAIL}")
