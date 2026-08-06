@@ -4,6 +4,9 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
 
+# NEW
+from django.views.generic import TemplateView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('income/', include('income.urls')),
@@ -13,7 +16,16 @@ urlpatterns = [
     path('emi/', include('emi.urls')),
     path('reports/', include('reports.urls')),
 
-    # Redirect root URL to /user/
+    # NEW - Service Worker
+    path(
+        "sw.js",
+        TemplateView.as_view(
+            template_name="sw.js",
+            content_type="application/javascript",
+        ),
+        name="sw",
+    ),
+
     path('', lambda request: redirect('user/', permanent=False)),
 ]
 

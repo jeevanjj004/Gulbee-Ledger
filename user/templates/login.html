@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#2563EB">
+    <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
     <title>GULBEE LEDGER - Smart Financial Management</title>
     
     <!-- Bootstrap & Font Awesome -->
@@ -986,6 +989,14 @@
             }
         }
     </style>
+
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+
+<meta name="theme-color" content="#2563eb">
+
+<link rel="icon" href="{% static 'icons/favicon-32.png' %}">
+
+<link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
 </head>
 
 <body>
@@ -1590,6 +1601,17 @@
         
         });
         </script>
-        
+        <script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async () => {
+        try {
+            const reg = await navigator.serviceWorker.register('/sw.js');
+            console.log("Service Worker Registered", reg);
+        } catch (err) {
+            console.error(err);
+        }
+    });
+}
+</script>
 </body>
 </html>

@@ -1,6 +1,11 @@
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.3
+aiosignal==1.4.0
 arabic-reshaper==3.0.0
 asgiref==3.11.0
 asn1crypto==1.5.1
+async-timeout==5.0.1
+attrs==26.1.0
 certifi==2025.11.12
 cffi==2.0.0
 charset-normalizer==3.4.4
@@ -11,10 +16,13 @@ django-background-tasks==1.2.8
 django-widget-tweaks==1.5.0
 et_xmlfile==2.0.0
 freetype-py==2.5.1
+frozenlist==1.8.0
 gunicorn==21.2.0
 html5lib==1.1
+http-ece==1.2.1
 idna==3.11
 lxml==6.0.2
+multidict==6.7.1
 mysqlclient==2.2.8
 numpy==2.2.6
 openpyxl==3.1.5
@@ -23,7 +31,9 @@ packaging==26.2
 pandas==2.3.3
 pdfkit==1.0.0
 pillow==12.0.0
+propcache==0.5.2
 psycopg2-binary==2.9.11
+py-vapid==1.9.4
 pycairo==1.29.0
 pycparser==2.23
 pyHanko==0.32.0
@@ -33,6 +43,7 @@ python-bidi==0.6.7
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 pytz==2025.2
+pywebpush==2.3.0
 PyYAML==6.0.3
 reportlab==4.4.5
 requests==2.32.5
@@ -50,3 +61,4 @@ urllib3==2.6.1
 webencodings==0.5.1
 whitenoise==6.11.0
 xhtml2pdf==0.2.17
+yarl==1.24.5
