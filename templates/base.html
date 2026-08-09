@@ -1,63 +1,99 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
-{% load static %}
-
-<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
 
-<meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gulbee Ledger</title>
 
-<title>Gulbee Ledger</title>
+    <!-- PWA Manifest -->
+    <link
+        rel="manifest"
+        href="{% static 'manifest.json' %}"
+    >
 
-<link rel="manifest" href="{% static 'manifest.json' %}">
+    <!-- Browser / PWA theme -->
+    <meta
+        name="theme-color"
+        content="#2563eb"
+    >
 
-<meta name="theme-color" content="#2563eb">
+    <!-- Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'icons/favicon-32.png' %}"
+    >
 
-<link rel="icon"
-      type="image/png"
-      href="{% static 'icons/favicon-32.png' %}">
+    <!-- Android -->
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
 
-<meta name="mobile-web-app-capable" content="yes">
+    <!-- iOS -->
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
 
-<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
 
-<meta name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent">
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Gulbee Ledger"
+    >
 
-<meta name="apple-mobile-web-app-title"
-      content="Gulbee Ledger">
-
-{% block head %}{% endblock %}
-
+    {% block head %}
+    {% endblock %}
 </head>
 
 <body>
 
-{% block content %}
-{% endblock %}
+    {% block content %}
+    {% endblock %}
 
-<script>
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration.scope);
-            })
-            .catch(error => {
-                console.error('Service Worker registration failed:', error);
+    <!-- Service Worker -->
+    <script>
+        if ("serviceWorker" in navigator) {
+
+            window.addEventListener("load", function () {
+
+                navigator.serviceWorker.register("/sw.js")
+                    .then(function (registration) {
+
+                        console.log(
+                            "Gulbee Ledger Service Worker registered:",
+                            registration.scope
+                        );
+
+                    })
+                    .catch(function (error) {
+
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+
+                    });
+
             });
-    });
-}
 
-</script>
+        }
+    </script>
 
-{% block scripts %}
-{% endblock %}
+
+    {% block scripts %}
+    {% endblock %}
 
 </body>
 </html>

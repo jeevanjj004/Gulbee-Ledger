@@ -1,4 +1,4 @@
-const CACHE_NAME = "gulbeeledger-v3";
+const CACHE_NAME = "gulbeeledger-v4";
 
 const OFFLINE_URL = "/user/";
 
@@ -6,6 +6,7 @@ const FILES_TO_CACHE = [
     "/",
     "/user/",
     "/static/manifest.json",
+
     "/static/icons/icon-192.png",
     "/static/icons/icon-512.png",
     "/static/icons/maskable-192.png",
@@ -13,74 +14,155 @@ const FILES_TO_CACHE = [
     "/static/icons/favicon-32.png"
 ];
 
-self.addEventListener("install", event => {
+
+// ===============================
+// INSTALL
+// ===============================
+
+self.addEventListener("install", function (event) {
+
     event.waitUntil(
+
         caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(FILES_TO_CACHE))
-            .then(() => self.skipWaiting())
-    );
-});
+            .then(function (cache) {
 
-self.addEventListener("activate", event => {
-    event.waitUntil(
-        caches.keys()
-            .then(keys => {
-                return Promise.all(
-                    keys
-                        .filter(key => key !== CACHE_NAME)
-                        .map(key => caches.delete(key))
-                );
+                return cache.addAll(FILES_TO_CACHE);
+
             })
-            .then(() => self.clients.claim())
+            .then(function () {
+
+                return self.skipWaiting();
+
+            })
+
     );
+
 });
 
-self.addEventListener("fetch", event => {
 
+// ===============================
+// ACTIVATE
+// ===============================
+
+self.addEventListener("activate", function (event) {
+
+    event.waitUntil(
+
+        caches.keys()
+            .then(function (cacheNames) {
+
+                return Promise.all(
+
+                    cacheNames
+                        .filter(function (cacheName) {
+
+                            return cacheName !== CACHE_NAME;
+
+                        })
+                        .map(function (cacheName) {
+
+                            return caches.delete(cacheName);
+
+                        })
+
+                );
+
+            })
+            .then(function () {
+
+                return self.clients.claim();
+
+            })
+
+    );
+
+});
+
+
+// ===============================
+// FETCH
+// ===============================
+
+self.addEventListener("fetch", function (event) {
+
+    // Only handle GET requests
     if (event.request.method !== "GET") {
         return;
     }
 
+
     event.respondWith(
+
         fetch(event.request)
-            .then(response => {
+
+            .then(function (response) {
 
                 // Cache successful responses
-                if (response && response.status === 200) {
-                    const responseClone = response.clone();
+                if (
+                    response &&
+                    response.status === 200 &&
+                    response.type !== "opaque"
+                ) {
+
+                    const responseClone =
+                        response.clone();
 
                     caches.open(CACHE_NAME)
-                        .then(cache => {
-                            cache.put(event.request, responseClone);
+                        .then(function (cache) {
+
+                            cache.put(
+                                event.request,
+                                responseClone
+                            );
+
                         });
+
                 }
 
                 return response;
+
             })
-            .catch(() => {
+
+            .catch(function () {
 
                 return caches.match(event.request)
-                    .then(cachedResponse => {
+
+                    .then(function (cachedResponse) {
 
                         if (cachedResponse) {
                             return cachedResponse;
                         }
 
-                        // For navigation requests, show cached app page
-                        if (event.request.mode === "navigate") {
-                            return caches.match(OFFLINE_URL);
+
+                        // If the user opens a page
+                        // while offline
+                        if (
+                            event.request.mode === "navigate"
+                        ) {
+
+                            return caches.match(
+                                OFFLINE_URL
+                            );
+
                         }
 
+
+                        // Fallback response
                         return new Response(
                             "You are offline.",
                             {
                                 status: 503,
                                 headers: {
-                                    "Content-Type": "text/plain"
+                                    "Content-Type":
+                                        "text/plain"
                                 }
                             }
                         );
+
                     });
+
             })
+
     );
+
 });
