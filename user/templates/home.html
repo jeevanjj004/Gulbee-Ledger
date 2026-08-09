@@ -2,37 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}
-{% extends "base.html" %}
-
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Gulbee Ledger</title>
-
-<!-- PWA Manifest -->
-<link rel="manifest" href="{% static 'manifest.json' %}">
-
-<!-- Theme -->
-<meta name="theme-color" content="#2563eb">
-
-<!-- Favicon -->
-<link rel="icon"
-      type="image/png"
-      href="{% static 'icons/favicon-32.png' %}">
-
-<!-- Android -->
-<meta name="mobile-web-app-capable" content="yes">
-
-<!-- iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent">
-<meta name="apple-mobile-web-app-title"
-      content="Gulbee Ledger">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard – Expense Manager</title>
@@ -45,8 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    {% load static %}
-
+    
     <style>
         /* ================= CSS VARIABLES ================= */
         :root {
@@ -924,27 +892,5 @@
             });
         });
     </script>
-    <script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log(
-                    'Service Worker registered:',
-                    registration.scope
-                );
-            })
-            .catch(error => {
-                console.error(
-                    'Service Worker registration failed:',
-                    error
-                );
-            });
-    });
-}
-</script>
-
-</body>
-</html>
 </body>
 </html>
