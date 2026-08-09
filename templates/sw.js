@@ -1,5 +1,4 @@
-const CACHE_NAME = "gulbeeledger-v2";
-
+const CACHE_NAME="gulbeeledger-v2";
 const FILES_TO_CACHE = [
     "/",
     "/user/",
