@@ -1,14 +1,16 @@
 {
+  
+  "id": "/",
   "name": "Gulbee Ledger",
   "short_name": "Gulbee",
-  "description": "Smart Financial Management",
+  "description": "Smart Financial Management Platform",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f172a",
   "theme_color": "#2563eb",
-  "lang": "en",
+  "background_color": "#0f172a",
+
   "icons": [
     {
       "src": "/static/icons/icon-192.png",
